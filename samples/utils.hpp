@@ -3,6 +3,7 @@
 #include <string>
 #include "dlm/cl/device.hpp"
 #include "dlm/cl/memory.hpp"
+#include "timer.hpp"
 
 #define checkError(func) \
   if (errcode != CL_SUCCESS)\
@@ -25,5 +26,13 @@ struct Program {
 
 void releaseProgram(Program p);
 Program buildProgram(dlmcl::Device dev, std::string path, std::string kernelName);
+
+
+bool compare(  const float* __restrict const xs,
+            const float* __restrict const ys,
+            const int n);
+double testCopy(dlmcl::Device dev, size_t memsize, dlmcl::Memory* mem);
+double testGrammian(dlmcl::Device dev, dlmcl::Memory* in, dlmcl::Memory* out, size_t vecSz, size_t n);
+double testSq(dlmcl::Device dev, dlmcl::Memory* in, dlmcl::Memory* out, size_t n);
 
 #endif // INIT_HPP_

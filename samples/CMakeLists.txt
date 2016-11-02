@@ -18,9 +18,12 @@ set(SOURCE_FILES
     ${DIR_INC}/dlm/cl/device.hpp
     ${DIR_INC}/dlm/cl/memory.hpp
 
-    init.cpp
+    device.cpp
     main.cpp
-    utils.cpp
+    program.cpp
+    tests.cpp
+    grammian.cpp
+    timer.hpp
     utils.hpp
 )
 
