@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <string.h>
 
 #include "utils.hpp"
 #include "dlm/cl/memory.hpp"
@@ -22,9 +23,9 @@ bool compare(  const float* __restrict const xs,
     return true;
 }
 
-double testCopy(dlmcl::Device dev, size_t memsize, dlmcl::Memory* mem)
+double testCopy(dlmcl::Device& dev, dlmcl::Memory* mem)
 {
-    const int itCount = 1000;
+    const int itCount = 300;
     void* tmp = new char[mem->getSize()];
     clFinish(dev.queue);
 
@@ -32,20 +33,19 @@ double testCopy(dlmcl::Device dev, size_t memsize, dlmcl::Memory* mem)
     for (int i=0; i<itCount; ++i) {
         void* buffer = mem->switchToHost();
         memcpy(tmp, buffer, mem->getSize());
-        memset(buffer, 0xdeadbeef, mem->getSize());
+        memset(buffer, (unsigned int)0xdeadbeef, mem->getSize()); //-V575
         mem->switchToDevice();
     }
     clFinish(dev.queue);
     t.stop();
 
     delete [] tmp;
-    return t.get();
+    return t.get() / itCount;
 }
 
-double testSq(dlmcl::Device dev, dlmcl::Memory* in, dlmcl::Memory* out, size_t n)
+double testSq(dlmcl::Device& dev, dlmcl::Memory* in, dlmcl::Memory* out, size_t n)
 {
     const int itCount = 200;
-    size_t sz = n * sizeof(float);
     cl_int errcode;
 
     Program prg = buildProgram(dev, DLM_SAMPLE_DIR "simple.cl", "squareArray");
@@ -56,7 +56,7 @@ double testSq(dlmcl::Device dev, dlmcl::Memory* in, dlmcl::Memory* out, size_t n
     Timer t;
     for (int it = 0; it < itCount; ++it) {
         void* inMem = in->switchToHost();
-        memset(inMem, 0xdeadbeef, in->getSize());
+        memset(inMem, (unsigned int)0xdeadbeef, in->getSize()); //-V575
 
         cl_mem devIn = in->switchToDevice();
         checkErrorEx(errcode = clSetKernelArg(prg.kernel, 0, sizeof(devIn), &devIn););
@@ -75,5 +75,5 @@ double testSq(dlmcl::Device dev, dlmcl::Memory* in, dlmcl::Memory* out, size_t n
 
     releaseProgram(prg);
     delete [] tmp;
-    return t.get();
+    return t.get() / itCount;
 }

@@ -10,31 +10,27 @@
 #include <iostream>
 #include "utils.hpp"
 #include "dlm/cl/memory.hpp"
+#include "dlm/cl/deviceInfo.hpp"
 
 using namespace dlmcl;
 
-void testDevice(int num)
-{
 
-    dlmcl::Device dev;
-    initOpenCl(dev, num);
+void testDevice(cl_device_id device)
+{
+    dlmcl::Device dev(device);
     printDeviceInfo(dev);
 
-        // copy
     const size_t memsize = 1024*512;
     std::cout << "== copy test (ms) ==" << std::endl;
+    {
+        dlmcl::GenericMemory mem(dev, memsize, CL_MEM_READ_WRITE);
+        std::cout << "gen: " << testCopy(dev, &mem) << std::endl;
+    }
+    {
+        dlmcl::HostMemory mem(dev, memsize, CL_MEM_READ_WRITE);
+        std::cout << "host: " << testCopy(dev, &mem) << std::endl;
+    }
 
-    std::cout << "gen: "
-        << testCopy(dev, memsize, &dlmcl::GenericMemory(dev, memsize, CL_MEM_READ_WRITE))
-        << std::endl;
-
-    std::cout << "host: "
-        << testCopy(dev, memsize, &dlmcl::HostMemory(dev, memsize, CL_MEM_READ_WRITE))
-        << std::endl;
-
-    std::cout << "device: "
-        << testCopy(dev, memsize, &dlmcl::DeviceMemory(dev, memsize, CL_MEM_READ_WRITE))
-        << std::endl;
 
     // grammian
     size_t n = 2*128;
@@ -43,65 +39,121 @@ void testDevice(int num)
     size_t osz = n*n*sizeof(float);
 
     std::cout << "== grammian calc test (ms) ==" << std::endl;
-    std::cout << "gen to gen: "
-        << testGrammian(dev, &GenericMemory(dev, isz, CL_MEM_READ_ONLY), &GenericMemory(dev, osz, CL_MEM_WRITE_ONLY), k, n)
-        << std::endl;
+    {
+        GenericMemory memIn(dev, isz, CL_MEM_READ_ONLY);
+        GenericMemory memOut(dev, osz, CL_MEM_WRITE_ONLY);
+        std::cout << "gen to gen: " << testGrammian(dev, &memIn, &memOut, k, n) << std::endl;
+    }
+    {
+        HostMemory memIn(dev, isz, CL_MEM_READ_ONLY);
+        HostMemory memOut(dev, osz, CL_MEM_WRITE_ONLY);
+        std::cout << "host to host: " << testGrammian(dev, &memIn, &memOut, k, n) << std::endl;
+    }
+    {
+        HostMemory memIn(dev, isz, CL_MEM_READ_ONLY);
+        GenericMemory memOut(dev, osz, CL_MEM_WRITE_ONLY);
+        std::cout << "host to gen: " << testGrammian(dev, &memIn, &memOut, k, n) << std::endl;
+    }
+    {
+        GenericMemory memIn(dev, isz, CL_MEM_READ_ONLY);
+        HostMemory memOut(dev, osz, CL_MEM_WRITE_ONLY);
+        std::cout << "gen to host: " << testGrammian(dev, &memIn, &memOut, k, n) << std::endl;
+    }
+    if (dev.info.supportMemoryType(MT_DEVICE)) {
+        {
+            DeviceMemory memIn(dev, isz, CL_MEM_READ_ONLY);
+            GenericMemory memOut(dev, osz, CL_MEM_WRITE_ONLY);
+            std::cout << "dev to gen: " << testGrammian(dev, &memIn, &memOut, k, n) << std::endl;
+        }
+        {
+            DeviceMemory memIn(dev, isz, CL_MEM_READ_ONLY);
+            HostMemory memOut(dev, osz, CL_MEM_WRITE_ONLY);
+            std::cout << "dev to host: " << testGrammian(dev, &memIn, &memOut, k, n) << std::endl;
+        }
+    }
 
-    std::cout << "host to host: "
-        << testGrammian(dev, &HostMemory(dev, isz, CL_MEM_READ_ONLY), &HostMemory(dev, osz, CL_MEM_WRITE_ONLY), k, n)
-        << std::endl;
-
-    std::cout << "host to gen: "
-        << testGrammian(dev, &HostMemory(dev, isz, CL_MEM_READ_ONLY), &GenericMemory(dev, osz, CL_MEM_WRITE_ONLY), k, n)
-        << std::endl;
-
-    std::cout << "gen to host: "
-        << testGrammian(dev, &GenericMemory(dev, isz, CL_MEM_READ_ONLY), &HostMemory(dev, osz, CL_MEM_WRITE_ONLY), k, n)
-        << std::endl;
-
-    std::cout << "dev to gen: "
-        << testGrammian(dev, &DeviceMemory(dev, isz, CL_MEM_READ_ONLY), &GenericMemory(dev, osz, CL_MEM_WRITE_ONLY), k, n)
-        << std::endl;
-
-    std::cout << "dev to host: "
-        << testGrammian(dev, &DeviceMemory(dev, isz, CL_MEM_READ_ONLY), &HostMemory(dev, osz, CL_MEM_WRITE_ONLY), k, n)
-        << std::endl;
-
+    {
+        Memory* memIn = getOptimalMemory(dev, isz, CL_MEM_READ_ONLY);
+        Memory* memOut = getOptimalMemory(dev, osz, CL_MEM_WRITE_ONLY);
+        std::cout << "auto to auto: " << testGrammian(dev, memIn, memOut, k, n) << std::endl;
+        delete memIn;
+        delete memOut;
+    }
     // squary array
     n = 1024*1024;
     size_t sz = n*sizeof(float);
 
     std::cout << "== sq test (ms) ==" << std::endl;
-    std::cout << "gen to gen: "
-        << testSq(dev, &GenericMemory(dev, sz, CL_MEM_READ_ONLY), &GenericMemory(dev, sz, CL_MEM_WRITE_ONLY), n)
-        << std::endl;
-
-    std::cout << "host to host: "
-        << testSq(dev, &HostMemory(dev, sz, CL_MEM_READ_ONLY), &HostMemory(dev, sz, CL_MEM_WRITE_ONLY), n)
-        << std::endl;
-
-    std::cout << "host to gen: "
-        << testSq(dev, &HostMemory(dev, sz, CL_MEM_READ_ONLY), &GenericMemory(dev, sz, CL_MEM_WRITE_ONLY), n)
-        << std::endl;
-
-    std::cout << "gen to host: "
-        << testSq(dev, &GenericMemory(dev, sz, CL_MEM_READ_ONLY), &HostMemory(dev, sz, CL_MEM_WRITE_ONLY), n)
-        << std::endl;
-
-     std::cout << "dev to gen: "
-        << testSq(dev, &DeviceMemory(dev, sz, CL_MEM_READ_ONLY), &GenericMemory(dev, sz, CL_MEM_WRITE_ONLY), n)
-        << std::endl;
-
-    std::cout << "dev to host: "
-        << testSq(dev, &DeviceMemory(dev, sz, CL_MEM_READ_ONLY), &HostMemory(dev, sz, CL_MEM_WRITE_ONLY), n)
-        << std::endl;
+    {
+            GenericMemory memIn(dev, sz, CL_MEM_READ_ONLY);
+            GenericMemory memOut(dev, sz, CL_MEM_WRITE_ONLY);
+            std::cout << "gen to gen: " << testSq(dev, &memIn, &memOut, n) << std::endl;
+    }
+    {
+            HostMemory memIn(dev, sz, CL_MEM_READ_ONLY);
+            HostMemory memOut(dev, sz, CL_MEM_WRITE_ONLY);
+            std::cout << "host to host: " << testSq(dev, &memIn, &memOut, n) << std::endl;
+    }
+    {
+            HostMemory memIn(dev, sz, CL_MEM_READ_ONLY);
+            GenericMemory memOut(dev, sz, CL_MEM_WRITE_ONLY);
+            std::cout << "host to gen: " << testSq(dev, &memIn, &memOut, n) << std::endl;
+    }
+    {
+            GenericMemory memIn(dev, sz, CL_MEM_READ_ONLY);
+            HostMemory memOut(dev, sz, CL_MEM_WRITE_ONLY);
+            std::cout << "gen to host: " << testSq(dev, &memIn, &memOut, n) << std::endl;
+    }
+    if (dev.info.supportMemoryType(MT_DEVICE)) {
+        {
+                DeviceMemory memIn(dev, sz, CL_MEM_READ_ONLY);
+                GenericMemory memOut(dev, sz, CL_MEM_WRITE_ONLY);
+                std::cout << "dev to gen: " << testSq(dev, &memIn, &memOut, n) << std::endl;
+        }
+        {
+                DeviceMemory memIn(dev, sz, CL_MEM_READ_ONLY);
+                HostMemory memOut(dev, sz, CL_MEM_WRITE_ONLY);
+                std::cout << "dev to host: " << testSq(dev, &memIn, &memOut, n) << std::endl;
+        }
+    }
+    {
+        Memory* memIn = getOptimalMemory(dev, sz, CL_MEM_READ_ONLY);
+        Memory* memOut = getOptimalMemory(dev, sz, CL_MEM_WRITE_ONLY);
+        std::cout << "auto to auto: " << testSq(dev, memIn, memOut, n) << std::endl;
+        delete memIn;
+        delete memOut;
+    }
 }
 
 int main(void)
 {
-    testDevice(0);
-    std::cout << "\n=============================\n" << std::endl;
-    testDevice(1);
+    cl_int errcode;
+    cl_platform_id platform[10];
+    cl_uint platformsNum;
+    errcode = clGetPlatformIDs(10, platform, &platformsNum);
+
+    checkError(clGetPlatformIDs);
+    printf("OpenCL platforms found: %i\n", (int)platformsNum);
+
+    for (cl_uint platformIdx = 0; platformIdx < platformsNum; ++platformIdx) {
+        cl_device_id devices[10];
+        cl_uint devicesNum;
+        clGetDeviceIDs(platform[platformIdx], CL_DEVICE_TYPE_ALL, 10, devices, &devicesNum);
+        printf("GPGPU devices found: %i\n", (int)devicesNum);
+
+        for (cl_uint deviceIdx = 0; deviceIdx < devicesNum; ++deviceIdx)
+        {
+            size_t valueSize;
+            clGetDeviceInfo(devices[deviceIdx], CL_DEVICE_NAME, 0, NULL, &valueSize);
+            char* value = new char[valueSize];
+            clGetDeviceInfo(devices[deviceIdx], CL_DEVICE_NAME, valueSize, value, NULL);
+            std::cout << "Use device #" << deviceIdx << " : " << value << std::endl;
+            delete[] value;
+
+            testDevice(devices[deviceIdx]);
+            std::cout << "\n=============================\n" << std::endl;
+        }
+    }
 
     return 0;
 }

@@ -33,4 +33,18 @@
 #define DLM_EXTRACT_BITS(x, offset, size)   ( DLM_BIT_HIGH_BITS(x, offset) & DLM_BIT_LOW_MASK(size) )
 #define DLM_WRAP_STATEMENT(expr) do { expr } while(0)
 
+#ifdef __cplusplus
+    #define DLM_CMODULE_START extern "C" {
+    #define DLM_CMODULE_END }
+#else
+    #define DLM_CMODULE_START
+    #define DLM_CMODULE_END
+#endif
+
+#if defined(_MSC_VER)
+    #define DLM_UNUSED(param)
+#else
+    #define DLM_UNUSED(param) param __attribute__((unused))
+#endif
+
 #endif /* DLM_ENV_MACRO_H_ */

@@ -3,19 +3,19 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <string.h>
 
 #include "utils.hpp"
 #include "dlm/cl/memory.hpp"
 
 using namespace dlmcl;
 
+
 void gramCpu(   const float * __restrict const  vs,
                 float * __restrict const        output,
                 const int                       n,
                 const int                       vecSz)
 {
-   clock_t startCPU = clock();
-
    for (int i=0; i<n; ++i)
    for (int j=0; j<n; ++j)
    {
@@ -30,12 +30,12 @@ void gramCpu(   const float * __restrict const  vs,
    }
 }
 
-void testc(Device dev, size_t n, size_t k)
+void testc(Device& dev, size_t n, size_t k)
 {
     float* in = new float[n*k];
     float* out = new float[n*n];
-    for (int i=0; i<n*k; ++i)
-        in[i] = rand() % 80;
+    for (size_t i=0; i<n*k; ++i)
+        in[i] = (float)(rand() % 80);
     gramCpu(in, out, n, k);
     cl_int errcode;
     Program prg = buildProgram(dev, DLM_SAMPLE_DIR "grammian.cl", "computeGramMrx");
@@ -65,7 +65,7 @@ void testc(Device dev, size_t n, size_t k)
     releaseProgram(prg);
 }
 
-double testGrammian(dlmcl::Device dev, dlmcl::Memory* in, dlmcl::Memory* out, size_t vecSz, size_t n)
+double testGrammian(dlmcl::Device& dev, dlmcl::Memory* in, dlmcl::Memory* out, size_t vecSz, size_t n)
 {
     const int itCount = 50;
 	const int inSz = vecSz * n * sizeof(float);
@@ -82,7 +82,7 @@ double testGrammian(dlmcl::Device dev, dlmcl::Memory* in, dlmcl::Memory* out, si
     Timer t;
     for (int it = 0; it < itCount; ++it) {
         void* inMem = in->switchToHost();
-        memset(inMem, 0xdeadbeef, in->getSize());
+        memset(inMem, (unsigned int)0xdeadbeef, in->getSize()); //-V575
 
         cl_mem devIn = in->switchToDevice();
         checkErrorEx(errcode = clSetKernelArg(prg.kernel, 0, sizeof(devIn), &devIn););
@@ -93,7 +93,7 @@ double testGrammian(dlmcl::Device dev, dlmcl::Memory* in, dlmcl::Memory* out, si
 
         errcode = clEnqueueNDRangeKernel(dev.queue, prg.kernel, 2, NULL, glSz, locSz, 0, NULL, NULL);
         checkError(clEnqueueNDRangeKernel);
-        void* res = out->switchToHost();
+        out->switchToHost();
         //memcpy(tmp, res, out->getSize());
     }
     clFinish(dev.queue);
@@ -103,5 +103,5 @@ double testGrammian(dlmcl::Device dev, dlmcl::Memory* in, dlmcl::Memory* out, si
 
     releaseProgram(prg);
     delete [] tmp;
-    return t.get();
+    return t.get() / itCount;
 }

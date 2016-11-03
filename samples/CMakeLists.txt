@@ -6,18 +6,10 @@ include_directories(${OpenCL_INCLUDE_DIRS})
 link_directories(${OpenCL_LIBRARY})
 
 include_directories(${DIR_INC})
-# message(111 "${DIR_INC}")
 
 add_definitions(-DDLM_SAMPLE_DIR="${DIR_SAMPLE}/")
 
 set(SOURCE_FILES
-    ${DIR_INC}/dlm/env/macro.h
-    ${DIR_INC}/dlm/env/system.h
-    ${DIR_INC}/dlm/allocator.hpp
-    ${DIR_INC}/dlm/cl/base.hpp
-    ${DIR_INC}/dlm/cl/device.hpp
-    ${DIR_INC}/dlm/cl/memory.hpp
-
     device.cpp
     main.cpp
     program.cpp
@@ -29,3 +21,6 @@ set(SOURCE_FILES
 
 add_executable(sample ${SOURCE_FILES})
 target_link_libraries (sample ${OpenCL_LIBRARY})
+target_link_libraries (sample dlmCl)
+
+

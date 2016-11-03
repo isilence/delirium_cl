@@ -31,7 +31,7 @@ std::string loadFile(const std::string path) {
 }
 
 
-std::string getOptOptions(dlmcl::Device dev)
+std::string getOptOptions(dlmcl::Device& dev)
 {
     int vec_width;
     cl_uint cacheSize;
@@ -52,7 +52,7 @@ std::string getOptOptions(dlmcl::Device dev)
     return opt;
 }
 
-Program buildProgram(dlmcl::Device dev, std::string path, std::string kernelName)
+Program buildProgram(dlmcl::Device& dev, std::string path, std::string kernelName)
 {
     std::string src = loadFile(path);
     cl_int errcode;
@@ -60,7 +60,7 @@ Program buildProgram(dlmcl::Device dev, std::string path, std::string kernelName
     cl_program program = clCreateProgramWithSource(dev.context, 1, (const char **)&s, NULL, &errcode);
     checkError(clCreateProgramWithSource);
 
-    std::string buildOptions = "-cl-fast-relaxed-math -cl-no-signed-zeros -cl-mad-enable -O5 " + getOptOptions(dev);
+    std::string buildOptions = "-cl-fast-relaxed-math -cl-no-signed-zeros -cl-mad-enable " + getOptOptions(dev);
 
     errcode = clBuildProgram(program, 1, &dev.device, buildOptions.data(), NULL, NULL);
     if (errcode != CL_SUCCESS) {
