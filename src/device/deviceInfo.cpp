@@ -33,31 +33,17 @@ void DeviceInfo::initDeviceVendor(void)
 
 void DeviceInfo::initDeviceType(void)
 {
+    type = DT_UNKNOWN;
+
     cl_device_type clDeviceType;
     cl_int error = clGetDeviceInfo(device, CL_DEVICE_TYPE, sizeof(clDeviceType), &clDeviceType, nullptr);
-
-    if (error != CL_SUCCESS) {
-        type = DT_UNKNOWN;
+    if (error != CL_SUCCESS)
         return;
-    }
 
-    if (clDeviceType == CL_DEVICE_TYPE_CPU) {
+    if (clDeviceType == CL_DEVICE_TYPE_CPU)
         type = DT_CPU;
-        return;
-    }
-
-    if (clDeviceType != CL_DEVICE_TYPE_GPU && clDeviceType != CL_DEVICE_TYPE_ACCELERATOR)
-        return;
-
-    type = DT_GPU;
-
-    #if !defined(DLM_CL_SKIP_DEVICE_AMD)
-        if (vendor == CDV_AMD && DeviceInfoAMD::isIGPU(device))
-        {
-            type = DT_IGPU;
-            return;
-        }
-    #endif
+    else if (clDeviceType != CL_DEVICE_TYPE_GPU && clDeviceType != CL_DEVICE_TYPE_ACCELERATOR)
+        type = DT_GPU;
 }
 
 bool DeviceInfo::supportMemoryType(enum DLM_MEMORY_TYPE memType) const
@@ -65,10 +51,42 @@ bool DeviceInfo::supportMemoryType(enum DLM_MEMORY_TYPE memType) const
     if (memType == MT_DEVICE) {
         #if !defined(DLM_CL_SKIP_DEVICE_AMD)
             if (vendor == CDV_AMD)
-                return DeviceInfoAMD::supportDeviceMemory(device);
+                return DeviceInfoAMD::isSupportDeviceMemory(device);
         #endif
         return false;
     }
     return true;
 }
+
+void DeviceInfo::setDefault(void)
+{
+    vendor = CDV_UNKNOWN;
+    type = DT_UNKNOWN;
+
+    executionWidth = 0;
+    globalMemoryBanks = 0;
+    localMemoryBanks = 0;
+}
+
+
+void DeviceInfo::initialize(cl_device_id clDevice)
+{
+    device = clDevice;
+
+    setDefault();
+    initDeviceVendor();
+    initDeviceType();
+
+    switch (vendor) {
+    #if !defined(DLM_CL_SKIP_DEVICE_AMD)
+        case CDV_AMD:
+            DeviceInfoAMD::initDeviceInfo(clDevice, *this);
+            break;
+    #endif
+        case CDV_UNKNOWN:
+        default:
+            break;
+    }
+}
+
 

@@ -27,35 +27,41 @@ enum DLM_MEMORY_TYPE
     MT_DEVICE
 };
 
-#ifndef DLM_CL_SKIP_DEVICE_AMD
-    struct DeviceInfoAMD {
-        static bool isIGPU(const cl_device_id device);
-        static bool supportDeviceMemory(const cl_device_id device);
-    };
-#endif
-
 class DeviceInfo
 {
 protected:
-    cl_device_id& device;
+    cl_device_id device;
 
     void initDeviceVendor(void);
     void initDeviceType(void);
+
+    void setDefault(void);
+    void initialize(cl_device_id device);
 
     void operator=(const DeviceInfo&) = delete;
 public:
     DeviceInfo(void) = delete;
     DeviceInfo(const DeviceInfo&) = default;
-    explicit DeviceInfo(cl_device_id device): device(device) {
-        initDeviceVendor();
-        initDeviceType();
-    }
+    explicit DeviceInfo(cl_device_id device) {
+        initialize(device);
+    };
 
     enum DLM_DEVICE_VENDOR  vendor;
     enum DLM_DEVICE_TYPE    type;
+    cl_uint executionWidth; // 0 - can't determine width
+    cl_uint globalMemoryBanks;
+    cl_uint localMemoryBanks;
+
     bool supportMemoryType(enum DLM_MEMORY_TYPE memType) const;
 };
 
+#ifndef DLM_CL_SKIP_DEVICE_AMD
+
+    struct DeviceInfoAMD {
+        static void initDeviceInfo(const cl_device_id device, DeviceInfo& deviceInfo);
+        static bool isSupportDeviceMemory(const cl_device_id device);
+    };
+#endif
 
 
 } // ::dlmcl

@@ -19,6 +19,9 @@ void testDevice(cl_device_id device)
 {
     dlmcl::Device dev(device);
     printDeviceInfo(dev);
+    std::cout << dev.info.executionWidth << std::endl;
+    std::cout << dev.info.globalMemoryBanks << std::endl;
+    std::cout << dev.info.localMemoryBanks << std::endl;
 
     const size_t memsize = 1024*512;
     std::cout << "== copy test (ms) ==" << std::endl;
