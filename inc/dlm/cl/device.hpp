@@ -22,7 +22,6 @@ public:
         device = dev.device;
         context = dev.context;
         platform = dev.platform;
-        queue = dev.queue;
     }
     Device(cl_device_id device): info(device)
     {
@@ -36,7 +35,6 @@ public:
     cl_device_id device;
     cl_context context;
     cl_platform_id platform;
-    cl_command_queue queue;
     const DeviceInfo info;
 };
 

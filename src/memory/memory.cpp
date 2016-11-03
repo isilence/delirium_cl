@@ -18,3 +18,20 @@ bool Memory::isAccessTypeValid(const cl_mem_flags accessType)
             accessType == CL_MEM_READ_ONLY ||
             accessType == CL_MEM_WRITE_ONLY;
 }
+
+Memory* Memory::getOptimal(Device& dev, size_t size, cl_mem_flags clMemType)
+{
+    if (dev.info.type == DT_CPU || dev.info.type == DT_IGPU) {
+        return new HostMemory(dev, size, clMemType);
+    }
+
+    switch (clMemType) {
+        case CL_MEM_READ_ONLY:
+            return new DeviceMemory(dev, size, clMemType);
+        case CL_MEM_WRITE_ONLY:
+        case CL_MEM_READ_WRITE:
+            return new GenericMemory(dev, size, clMemType);
+        default :
+            throw new CLException();
+    }
+}

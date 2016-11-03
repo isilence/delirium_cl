@@ -42,26 +42,29 @@ void testc(Device& dev, size_t n, size_t k)
 
     const size_t glSz[] = {(size_t)n, (size_t)n};
     const size_t locSz[] = {8ul, 8ul};
-    clFinish(dev.queue);
+    cl_int error;
+    cl_command_queue queue = clCreateCommandQueueWithProperties(dev.context, dev.device, nullptr, &error);
+    clFinish(queue);
 
     GenericMemory devIn(dev, sizeof(float)*n*k, CL_MEM_READ_ONLY);
     GenericMemory devOut(dev, sizeof(float)*n*n, CL_MEM_WRITE_ONLY);
-    void* inMem = devIn.switchToHost();
+    void* inMem = devIn.switchToHost(queue);
     memcpy(inMem, in, sizeof(float) * n * k);
-    cl_mem devInm = devIn.switchToDevice();
+    cl_mem devInm = devIn.switchToDevice(queue);
     checkErrorEx(errcode = clSetKernelArg(prg.kernel, 0, sizeof(devInm), &devInm););
-    cl_mem devOutm = devOut.switchToDevice();
+    cl_mem devOutm = devOut.switchToDevice(queue);
     checkErrorEx(errcode = clSetKernelArg(prg.kernel, 1, sizeof(devOutm), &devOutm););
     checkErrorEx(errcode = clSetKernelArg(prg.kernel, 2, sizeof(k), &k););
 
-    errcode = clEnqueueNDRangeKernel(dev.queue, prg.kernel, 2, NULL, glSz, locSz, 0, NULL, NULL);
+    errcode = clEnqueueNDRangeKernel(queue, prg.kernel, 2, NULL, glSz, locSz, 0, NULL, NULL);
     checkError(clEnqueueNDRangeKernel);
-    clFinish(dev.queue);
+    clFinish(queue);
 
-    float* res = (float*)devOut.switchToHost();
+    float* res = (float*)devOut.switchToHost(queue);
     if (!compare(out, res, n))
         std::cout << "result mismatch!" << std::endl;
 
+    clReleaseCommandQueue(queue);
     releaseProgram(prg);
 }
 
@@ -74,33 +77,35 @@ double testGrammian(dlmcl::Device& dev, dlmcl::Memory* in, dlmcl::Memory* out, s
 
     Program prg = buildProgram(dev, DLM_SAMPLE_DIR "grammian.cl", "computeGramMrx");
     char* tmp = new char[out->getSize()];
-
+    cl_int error;
+    cl_command_queue queue = clCreateCommandQueueWithProperties(dev.context, dev.device, nullptr, &error);
     const size_t glSz[] = {(size_t)n, (size_t)n};
     const size_t locSz[] = {8ul, 8ul};
-    clFinish(dev.queue);
+    clFinish(queue);
 
     Timer t;
     for (int it = 0; it < itCount; ++it) {
-        void* inMem = in->switchToHost();
+        void* inMem = in->switchToHost(queue);
         memset(inMem, (unsigned int)0xdeadbeef, in->getSize()); //-V575
 
-        cl_mem devIn = in->switchToDevice();
+        cl_mem devIn = in->switchToDevice(queue);
         checkErrorEx(errcode = clSetKernelArg(prg.kernel, 0, sizeof(devIn), &devIn););
 
-        cl_mem devOut = out->switchToDevice();
+        cl_mem devOut = out->switchToDevice(queue);
         checkErrorEx(errcode = clSetKernelArg(prg.kernel, 1, sizeof(devOut), &devOut););
         checkErrorEx(errcode = clSetKernelArg(prg.kernel, 2, sizeof(vecSz), &vecSz););
 
-        errcode = clEnqueueNDRangeKernel(dev.queue, prg.kernel, 2, NULL, glSz, locSz, 0, NULL, NULL);
+        errcode = clEnqueueNDRangeKernel(queue, prg.kernel, 2, NULL, glSz, locSz, 0, NULL, NULL);
         checkError(clEnqueueNDRangeKernel);
-        out->switchToHost();
+        out->switchToHost(queue);
         //memcpy(tmp, res, out->getSize());
     }
-    clFinish(dev.queue);
+    clFinish(queue);
     t.stop();
 
     testc(dev, n, vecSz);
 
+    clReleaseCommandQueue(queue);
     releaseProgram(prg);
     delete [] tmp;
     return t.get() / itCount;

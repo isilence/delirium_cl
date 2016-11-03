@@ -29,14 +29,10 @@ void Device::initialize(cl_device_id clDevice)
     device = clDevice;
     platform = clPlatform;
     context = clContext;
-
-    // todo: check error
-    queue = clCreateCommandQueueWithProperties(clContext, clDevice, nullptr, &error);
 }
 
 void Device::release(void)
 {
-    clReleaseCommandQueue(queue);
     clReleaseContext(context);
     clReleaseDevice(device);
 }

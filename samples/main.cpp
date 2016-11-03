@@ -73,8 +73,8 @@ void testDevice(cl_device_id device)
     }
 
     {
-        Memory* memIn = getOptimalMemory(dev, isz, CL_MEM_READ_ONLY);
-        Memory* memOut = getOptimalMemory(dev, osz, CL_MEM_WRITE_ONLY);
+        Memory* memIn = Memory::getOptimal(dev, isz, CL_MEM_READ_ONLY);
+        Memory* memOut = Memory::getOptimal(dev, osz, CL_MEM_WRITE_ONLY);
         std::cout << "auto to auto: " << testGrammian(dev, memIn, memOut, k, n) << std::endl;
         delete memIn;
         delete memOut;
@@ -117,8 +117,8 @@ void testDevice(cl_device_id device)
         }
     }
     {
-        Memory* memIn = getOptimalMemory(dev, sz, CL_MEM_READ_ONLY);
-        Memory* memOut = getOptimalMemory(dev, sz, CL_MEM_WRITE_ONLY);
+        Memory* memIn = Memory::getOptimal(dev, sz, CL_MEM_READ_ONLY);
+        Memory* memOut = Memory::getOptimal(dev, sz, CL_MEM_WRITE_ONLY);
         std::cout << "auto to auto: " << testSq(dev, memIn, memOut, n) << std::endl;
         delete memIn;
         delete memOut;
@@ -149,7 +149,6 @@ int main(void)
             clGetDeviceInfo(devices[deviceIdx], CL_DEVICE_NAME, valueSize, value, NULL);
             std::cout << "Use device #" << deviceIdx << " : " << value << std::endl;
             delete[] value;
-
             testDevice(devices[deviceIdx]);
             std::cout << "\n=============================\n" << std::endl;
         }

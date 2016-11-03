@@ -15,14 +15,14 @@ DeviceMemory::~DeviceMemory()
     clReleaseMemObject(devMemory);
 }
 
-void* DeviceMemory::switchToHost(void)
+void* DeviceMemory::switchToHost(cl_command_queue queue)
 {
-    hostMemory = clEnqueueMapBuffer(device.queue, devMemory, CL_TRUE, maptype, 0, memsize, 0, NULL, NULL, NULL);
+    hostMemory = clEnqueueMapBuffer(queue, devMemory, CL_TRUE, maptype, 0, memsize, 0, NULL, NULL, NULL);
     return hostMemory;
 };
 
-cl_mem DeviceMemory::switchToDevice(void)
+cl_mem DeviceMemory::switchToDevice(cl_command_queue queue)
 {
-    clEnqueueUnmapMemObject(device.queue, devMemory, hostMemory, 0, NULL, NULL);
+    clEnqueueUnmapMemObject(queue, devMemory, hostMemory, 0, NULL, NULL);
     return devMemory;
 };

@@ -15,16 +15,16 @@ GenericMemory::~GenericMemory(void)
     clReleaseMemObject(devMemory);
 }
 
-void* GenericMemory::switchToHost(void)
+void* GenericMemory::switchToHost(cl_command_queue queue)
 {
     if (accessType == CL_MEM_WRITE_ONLY || accessType == CL_MEM_READ_WRITE)
-        clEnqueueReadBuffer(device.queue, devMemory, CL_TRUE, 0, memsize, hostMemory, 0, NULL, NULL);
+        clEnqueueReadBuffer(queue, devMemory, CL_TRUE, 0, memsize, hostMemory, 0, NULL, NULL);
     return hostMemory;
 };
 
-cl_mem GenericMemory::switchToDevice(void)
+cl_mem GenericMemory::switchToDevice(cl_command_queue queue)
 {
     if (accessType == CL_MEM_READ_ONLY || accessType == CL_MEM_READ_WRITE)
-        clEnqueueWriteBuffer(device.queue, devMemory, CL_TRUE, 0, memsize, hostMemory, 0, NULL, NULL);
+        clEnqueueWriteBuffer(queue, devMemory, CL_TRUE, 0, memsize, hostMemory, 0, NULL, NULL);
     return devMemory;
 };

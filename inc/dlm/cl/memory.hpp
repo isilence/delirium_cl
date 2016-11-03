@@ -33,9 +33,12 @@ public:
             throw new CLException();
     }
 
+    static Memory* getOptimal(Device& dev, size_t size, cl_mem_flags accessType);
+
+
     virtual ~Memory(void) {};
-    virtual void*  switchToHost(void) = 0;
-    virtual cl_mem switchToDevice(void) = 0;
+    virtual void*  switchToHost(cl_command_queue queue) = 0;
+    virtual cl_mem switchToDevice(cl_command_queue queue) = 0;
 
     inline size_t getSize() const
     {
@@ -46,8 +49,6 @@ public:
     {
         return accessType;
     }
-
-
 };
 
 class GenericMemory : public Memory
@@ -59,8 +60,8 @@ public:
     GenericMemory(Device& device, size_t size, cl_mem_flags accessType);
     virtual ~GenericMemory();
 
-    virtual void* switchToHost(void) override;
-    virtual cl_mem switchToDevice(void) override;
+    virtual void* switchToHost(cl_command_queue queue) override;
+    virtual cl_mem switchToDevice(cl_command_queue queue) override;
 };
 
 
@@ -74,9 +75,9 @@ public:
     HostMemory(Device& device, size_t size, cl_mem_flags accessType);
     virtual ~HostMemory();
 
-    virtual void* switchToHost(void) override;
+    virtual void* switchToHost(cl_command_queue queue) override;
 
-    virtual cl_mem switchToDevice(void) override;
+    virtual cl_mem switchToDevice(cl_command_queue queue) override;
 };
 
 
@@ -90,30 +91,10 @@ public:
     DeviceMemory(Device& device, size_t size, cl_mem_flags accessType);
     virtual ~DeviceMemory();
 
-    virtual void* switchToHost(void) override;
-    virtual cl_mem switchToDevice(void) override;
+    virtual void* switchToHost(cl_command_queue queue) override;
+    virtual cl_mem switchToDevice(cl_command_queue queue) override;
 
 };
-
-
-inline Memory* getOptimalMemory(Device& dev, size_t size, cl_mem_flags accessType)
-{
-    if (dev.info.type == DT_CPU || dev.info.type == DT_IGPU) {
-        return new HostMemory(dev, size, accessType);
-    }
-
-    switch (accessType) {
-        case CL_MEM_READ_ONLY:
-            return new DeviceMemory(dev, size, accessType);
-        case CL_MEM_WRITE_ONLY:
-            return new HostMemory(dev, size, accessType);
-        case CL_MEM_READ_WRITE:
-            return new GenericMemory(dev, size, accessType);
-        default :
-            throw -1;
-    }
-}
-
 
 }; // ::dlmcl
 #endif // DLM_CL_MEMORY_HPP_

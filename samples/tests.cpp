@@ -27,18 +27,21 @@ double testCopy(dlmcl::Device& dev, dlmcl::Memory* mem)
 {
     const int itCount = 300;
     void* tmp = new char[mem->getSize()];
-    clFinish(dev.queue);
+
+    cl_int error;
+    cl_command_queue queue = clCreateCommandQueueWithProperties(dev.context, dev.device, nullptr, &error);
 
     Timer t;
     for (int i=0; i<itCount; ++i) {
-        void* buffer = mem->switchToHost();
+        void* buffer = mem->switchToHost(queue);
         memcpy(tmp, buffer, mem->getSize());
         memset(buffer, (unsigned int)0xdeadbeef, mem->getSize()); //-V575
-        mem->switchToDevice();
+        mem->switchToDevice(queue);
     }
-    clFinish(dev.queue);
+    clFinish(queue);
     t.stop();
 
+    clReleaseCommandQueue(queue);
     delete [] tmp;
     return t.get() / itCount;
 }
@@ -50,29 +53,31 @@ double testSq(dlmcl::Device& dev, dlmcl::Memory* in, dlmcl::Memory* out, size_t 
 
     Program prg = buildProgram(dev, DLM_SAMPLE_DIR "simple.cl", "squareArray");
     char* tmp = new char[out->getSize()];
+    cl_int error;
+    cl_command_queue queue = clCreateCommandQueueWithProperties(dev.context, dev.device, nullptr, &error);
 
     const size_t locSz[] = {64ul};
-    clFinish(dev.queue);
+    clFinish(queue);
     Timer t;
     for (int it = 0; it < itCount; ++it) {
-        void* inMem = in->switchToHost();
+        void* inMem = in->switchToHost(queue);
         memset(inMem, (unsigned int)0xdeadbeef, in->getSize()); //-V575
 
-        cl_mem devIn = in->switchToDevice();
+        cl_mem devIn = in->switchToDevice(queue);
         checkErrorEx(errcode = clSetKernelArg(prg.kernel, 0, sizeof(devIn), &devIn););
 
-        cl_mem devOut = out->switchToDevice();
+        cl_mem devOut = out->switchToDevice(queue);
         checkErrorEx(errcode = clSetKernelArg(prg.kernel, 1, sizeof(devOut), &devOut););
 
-        errcode = clEnqueueNDRangeKernel(dev.queue, prg.kernel, 1, NULL, &n, locSz, 0, NULL, NULL);
+        errcode = clEnqueueNDRangeKernel(queue, prg.kernel, 1, NULL, &n, locSz, 0, NULL, NULL);
         checkError(clEnqueueNDRangeKernel);
-        void* res = out->switchToHost();
+        void* res = out->switchToHost(queue);
         memcpy(tmp, res, out->getSize());
     }
-    clFinish(dev.queue);
+    clFinish(queue);
     t.stop();
 
-
+    clReleaseCommandQueue(queue);
     releaseProgram(prg);
     delete [] tmp;
     return t.get() / itCount;
