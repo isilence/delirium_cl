@@ -1,3 +1,7 @@
+/*
+ *  https://gist.github.com/ISilence/52b41a53fc0f0cbb538f
+ */
+
 __kernel void gramF_slow(
         __global const float * __restrict const        vs,
         __global float * __restrict const            output,

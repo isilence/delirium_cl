@@ -34,7 +34,7 @@ void testDevice(cl_device_id device)
 
     // grammian
     size_t n = 2*128;
-    const size_t k = 1024;
+    const size_t k = 2*1024;
     size_t isz = n*k*sizeof(float);
     size_t osz = n*n*sizeof(float);
 

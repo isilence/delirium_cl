@@ -17,5 +17,5 @@ namespace dlmcl {
 
 class CLException {};
 
-}; // ::dlmcl
+} // ::dlmcl
 #endif // DLM_CL_DEVICE_HPP_

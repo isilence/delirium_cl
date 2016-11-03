@@ -58,5 +58,5 @@ public:
 
 
 
-}; // ::dlmcl
+} // ::dlmcl
 #endif // DLM_CL_DEVICE_INFO_HPP_

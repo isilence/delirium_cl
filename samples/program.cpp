@@ -60,7 +60,10 @@ Program buildProgram(dlmcl::Device& dev, std::string path, std::string kernelNam
     cl_program program = clCreateProgramWithSource(dev.context, 1, (const char **)&s, NULL, &errcode);
     checkError(clCreateProgramWithSource);
 
-    std::string buildOptions = "-cl-fast-relaxed-math -cl-no-signed-zeros -cl-mad-enable " + getOptOptions(dev);
+    std::string buildOptions = "-cl-fast-relaxed-math -cl-no-signed-zeros -cl-mad-enable ";
+    if ((dev.info.type == DT_GPU || dev.info.type == DT_IGPU) && dev.info.vendor == CDV_AMD)
+        buildOptions += " -O5 ";
+    buildOptions += getOptOptions(dev);
 
     errcode = clBuildProgram(program, 1, &dev.device, buildOptions.data(), NULL, NULL);
     if (errcode != CL_SUCCESS) {

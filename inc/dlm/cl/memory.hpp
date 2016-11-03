@@ -30,7 +30,8 @@ public:
     Memory(Device& device, size_t size, cl_mem_flags accessType) :
         device(device),
         memsize(size),
-        accessType(accessType)
+        accessType(accessType),
+        hostMemory(nullptr)
     {
         if (!isAccessTypeValid(accessType))
             throw new CLException();
@@ -88,7 +89,7 @@ protected:
     cl_mem_flags maptype;
     bool isDeviceMode;
 
-    HostMemory(Device& device): Memory(device, 0, CL_MEM_READ_WRITE), isDeviceMode(true) {}
+    HostMemory(Device& device): Memory(device, 0, CL_MEM_READ_WRITE), maptype(0), isDeviceMode(true) {}
     friend class DeviceMemory;
 public:
     HostMemory(Device& device, size_t size, cl_mem_flags accessType);
@@ -101,12 +102,11 @@ public:
 
 class DeviceMemory : public HostMemory
 {
-    cl_mem_flags maptype;
     bool isDevice;
 
 public:
     DeviceMemory(Device& device, size_t size, cl_mem_flags accessType);
 };
 
-}; // ::dlmcl
+} // ::dlmcl
 #endif // DLM_CL_MEMORY_HPP_

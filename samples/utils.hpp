@@ -15,7 +15,6 @@
   command; \
   checkError(command);
 
-cl_device_id getDevice(int platIdx, int devIdx);
 void printDeviceInfo(dlmcl::Device& device);
 
 struct Program {

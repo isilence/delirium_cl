@@ -38,7 +38,7 @@ void GenericMemory::switchToHost(cl_command_queue queue)
 
     if (accessType == CL_MEM_WRITE_ONLY || accessType == CL_MEM_READ_WRITE)
         clEnqueueReadBuffer(queue, deviceMemory, CL_TRUE, 0, memsize, hostMemory, 0, NULL, NULL);
-};
+}
 
 void GenericMemory::switchToDevice(cl_command_queue queue)
 {
@@ -48,4 +48,4 @@ void GenericMemory::switchToDevice(cl_command_queue queue)
 
     if (accessType == CL_MEM_READ_ONLY || accessType == CL_MEM_READ_WRITE)
         clEnqueueWriteBuffer(queue, deviceMemory, CL_TRUE, 0, memsize, hostMemory, 0, NULL, NULL);
-};
+}

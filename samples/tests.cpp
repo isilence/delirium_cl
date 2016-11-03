@@ -26,7 +26,7 @@ bool compare(  const float* __restrict const xs,
 double testCopy(dlmcl::Device& dev, dlmcl::Memory* mem)
 {
     const int itCount = 300;
-    void* tmp = new char[mem->getSize()];
+    char* tmp = new char[mem->getSize()];
 
     cl_int error;
     cl_command_queue queue = clCreateCommandQueueWithProperties(dev.context, dev.device, nullptr, &error);

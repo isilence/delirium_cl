@@ -1,3 +1,7 @@
+#include "dlm/env/macro.h"
+DLM_CMODULE_START
+#include "amd/cl_ext.h"
+DLM_CMODULE_END
 #include "dlm/cl/memory.hpp"
 using namespace dlmcl;
 

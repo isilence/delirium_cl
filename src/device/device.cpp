@@ -21,8 +21,6 @@ cl_context Device::createSinleContext(cl_device_id clDevice)
 
 void Device::initialize(cl_device_id clDevice)
 {
-    cl_int error;
-
     cl_platform_id clPlatform = getPlatform(clDevice);
     cl_context clContext = createSinleContext(clDevice);
 

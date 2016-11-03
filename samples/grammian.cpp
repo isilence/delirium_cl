@@ -36,7 +36,7 @@ void testc(Device& dev, size_t n, size_t k)
     float* out = new float[n*n];
     for (size_t i=0; i<n*k; ++i)
         in[i] = (float)(rand() % 80);
-    gramCpu(in, out, n, k);
+    gramCpu(in, out, (int)n, (int)k);
     cl_int errcode;
     Program prg = buildProgram(dev, DLM_SAMPLE_DIR "grammian.cl", "computeGramMrx");
 
@@ -66,9 +66,11 @@ void testc(Device& dev, size_t n, size_t k)
 
     devOut.switchToHost(queue);
     float* res = (float*)devOut.getMemHost();
-    if (!compare(out, res, n))
+    if (!compare(out, res, (int)n))
         std::cout << "result mismatch!" << std::endl;
 
+    delete [] in;
+    delete [] out;
     clReleaseCommandQueue(queue);
     releaseProgram(prg);
 }
@@ -76,8 +78,6 @@ void testc(Device& dev, size_t n, size_t k)
 double testGrammian(dlmcl::Device& dev, dlmcl::Memory* in, dlmcl::Memory* out, size_t vecSz, size_t n)
 {
     const int itCount = 50;
-	const int inSz = vecSz * n * sizeof(float);
-	const int outSz = n * n * sizeof(float);
     cl_int errcode;
 
     Program prg = buildProgram(dev, DLM_SAMPLE_DIR "grammian.cl", "computeGramMrx");
@@ -105,7 +105,8 @@ double testGrammian(dlmcl::Device& dev, dlmcl::Memory* in, dlmcl::Memory* out, s
         errcode = clEnqueueNDRangeKernel(queue, prg.kernel, 2, NULL, glSz, locSz, 0, NULL, NULL);
         checkError(clEnqueueNDRangeKernel);
         out->switchToHost(queue);
-        //memcpy(tmp, res, out->getSize());
+        void* res = out->getMemHost();
+        memcpy(tmp, res, out->getSize());
     }
     clFinish(queue);
     t.stop();

@@ -31,7 +31,7 @@ void HostMemory::switchToHost(cl_command_queue queue)
         throw new CLException();
 
     hostMemory = hostSiteMemory;
-};
+}
 
 void HostMemory::switchToDevice(cl_command_queue queue)
 {
@@ -43,5 +43,5 @@ void HostMemory::switchToDevice(cl_command_queue queue)
     if (error != CL_SUCCESS)
         throw new CLException();
     hostMemory = nullptr;
-};
+}
 
