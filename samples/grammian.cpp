@@ -48,11 +48,15 @@ void testc(Device& dev, size_t n, size_t k)
 
     GenericMemory devIn(dev, sizeof(float)*n*k, CL_MEM_READ_ONLY);
     GenericMemory devOut(dev, sizeof(float)*n*n, CL_MEM_WRITE_ONLY);
-    void* inMem = devIn.switchToHost(queue);
+    devIn.switchToHost(queue);
+    void* inMem = devIn.getMemHost();
     memcpy(inMem, in, sizeof(float) * n * k);
-    cl_mem devInm = devIn.switchToDevice(queue);
+    devIn.switchToDevice(queue);
+    cl_mem devInm = devIn.getMemDevice();
     checkErrorEx(errcode = clSetKernelArg(prg.kernel, 0, sizeof(devInm), &devInm););
-    cl_mem devOutm = devOut.switchToDevice(queue);
+
+    devOut.switchToDevice(queue);
+    cl_mem devOutm = devOut.getMemDevice();
     checkErrorEx(errcode = clSetKernelArg(prg.kernel, 1, sizeof(devOutm), &devOutm););
     checkErrorEx(errcode = clSetKernelArg(prg.kernel, 2, sizeof(k), &k););
 
@@ -60,7 +64,8 @@ void testc(Device& dev, size_t n, size_t k)
     checkError(clEnqueueNDRangeKernel);
     clFinish(queue);
 
-    float* res = (float*)devOut.switchToHost(queue);
+    devOut.switchToHost(queue);
+    float* res = (float*)devOut.getMemHost();
     if (!compare(out, res, n))
         std::cout << "result mismatch!" << std::endl;
 
@@ -85,13 +90,15 @@ double testGrammian(dlmcl::Device& dev, dlmcl::Memory* in, dlmcl::Memory* out, s
 
     Timer t;
     for (int it = 0; it < itCount; ++it) {
-        void* inMem = in->switchToHost(queue);
+        in->switchToHost(queue);
+        void* inMem = in->getMemHost();
         memset(inMem, (unsigned int)0xdeadbeef, in->getSize()); //-V575
-
-        cl_mem devIn = in->switchToDevice(queue);
+        in->switchToDevice(queue);
+        cl_mem devIn = in->getMemDevice();
         checkErrorEx(errcode = clSetKernelArg(prg.kernel, 0, sizeof(devIn), &devIn););
 
-        cl_mem devOut = out->switchToDevice(queue);
+        out->switchToDevice(queue);
+        cl_mem devOut = out->getMemDevice();;
         checkErrorEx(errcode = clSetKernelArg(prg.kernel, 1, sizeof(devOut), &devOut););
         checkErrorEx(errcode = clSetKernelArg(prg.kernel, 2, sizeof(vecSz), &vecSz););
 

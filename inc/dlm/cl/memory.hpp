@@ -19,6 +19,9 @@ protected:
     size_t memsize;
     cl_mem_flags accessType;
 
+    cl_mem deviceMemory;
+    void* hostMemory;
+
     static cl_mem_flags getMapType(const cl_mem_flags accessType);
     static bool isAccessTypeValid(const cl_mem_flags accessType);
 
@@ -32,13 +35,12 @@ public:
         if (!isAccessTypeValid(accessType))
             throw new CLException();
     }
-
-    static Memory* getOptimal(Device& dev, size_t size, cl_mem_flags accessType);
-
-
     virtual ~Memory(void) {};
-    virtual void*  switchToHost(cl_command_queue queue) = 0;
-    virtual cl_mem switchToDevice(cl_command_queue queue) = 0;
+    virtual void switchToHost(cl_command_queue queue) = 0;
+    virtual void switchToDevice(cl_command_queue queue) = 0;
+
+    // ================
+    // partial impl
 
     inline size_t getSize() const
     {
@@ -49,51 +51,61 @@ public:
     {
         return accessType;
     }
+
+    inline cl_mem getMemDevice(void)
+    {
+        return deviceMemory;
+    }
+
+    inline void* getMemHost(void)
+    {
+        return hostMemory;
+    }
+
+    // ================
+    // static api
+
+    static Memory* getOptimal(Device& dev, size_t size, cl_mem_flags accessType);
+
 };
 
 class GenericMemory : public Memory
 {
-    cl_mem devMemory;
-    void* hostMemory;
+    bool isDevice;
 
 public:
     GenericMemory(Device& device, size_t size, cl_mem_flags accessType);
     virtual ~GenericMemory();
 
-    virtual void* switchToHost(cl_command_queue queue) override;
-    virtual cl_mem switchToDevice(cl_command_queue queue) override;
+    virtual void switchToHost(cl_command_queue queue) override;
+    virtual void switchToDevice(cl_command_queue queue) override;
 };
 
 
 class HostMemory : public Memory
 {
-    cl_mem devMemory;
-    void* hostMemory;
+protected:
     cl_mem_flags maptype;
+    bool isDeviceMode;
 
+    HostMemory(Device& device): Memory(device, 0, CL_MEM_READ_WRITE), isDeviceMode(true) {}
+    friend class DeviceMemory;
 public:
     HostMemory(Device& device, size_t size, cl_mem_flags accessType);
     virtual ~HostMemory();
 
-    virtual void* switchToHost(cl_command_queue queue) override;
-
-    virtual cl_mem switchToDevice(cl_command_queue queue) override;
+    virtual void switchToHost(cl_command_queue queue) override;
+    virtual void switchToDevice(cl_command_queue queue) override;
 };
 
 
-class DeviceMemory : public Memory
+class DeviceMemory : public HostMemory
 {
-    cl_mem devMemory;
-    void* hostMemory;
     cl_mem_flags maptype;
+    bool isDevice;
 
 public:
     DeviceMemory(Device& device, size_t size, cl_mem_flags accessType);
-    virtual ~DeviceMemory();
-
-    virtual void* switchToHost(cl_command_queue queue) override;
-    virtual cl_mem switchToDevice(cl_command_queue queue) override;
-
 };
 
 }; // ::dlmcl

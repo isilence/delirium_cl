@@ -1,28 +1,17 @@
 #include "dlm/cl/memory.hpp"
 using namespace dlmcl;
 
-DeviceMemory::DeviceMemory(Device& device, size_t size, cl_mem_flags accessType) :
-    Memory(device, size, accessType),
-    hostMemory(nullptr)
+DeviceMemory::DeviceMemory(Device& device, size_t size, cl_mem_flags type) :
+    HostMemory(device)
 {
     cl_int error;
-    devMemory = clCreateBuffer(device.context, CL_MEM_USE_PERSISTENT_MEM_AMD | accessType, size, nullptr, &error);
-    maptype = Memory::getMapType(accessType);
+    deviceMemory = clCreateBuffer(device.context, CL_MEM_USE_PERSISTENT_MEM_AMD | type, size, nullptr, &error);
+    if (error != CL_SUCCESS)
+        throw new CLException();
+
+    memsize = size;
+    accessType = type;
+    hostMemory = nullptr;
+    maptype = Memory::getMapType(type);
 }
 
-DeviceMemory::~DeviceMemory()
-{
-    clReleaseMemObject(devMemory);
-}
-
-void* DeviceMemory::switchToHost(cl_command_queue queue)
-{
-    hostMemory = clEnqueueMapBuffer(queue, devMemory, CL_TRUE, maptype, 0, memsize, 0, NULL, NULL, NULL);
-    return hostMemory;
-};
-
-cl_mem DeviceMemory::switchToDevice(cl_command_queue queue)
-{
-    clEnqueueUnmapMemObject(queue, devMemory, hostMemory, 0, NULL, NULL);
-    return devMemory;
-};

@@ -1,30 +1,51 @@
 #include "dlm/cl/memory.hpp"
 using namespace dlmcl;
 
-GenericMemory::GenericMemory(Device& device, size_t size, cl_mem_flags accessType) :
-    Memory(device, size, accessType)
+GenericMemory::GenericMemory(   Device& device,
+                                const size_t size,
+                                const cl_mem_flags accessType) :
+    Memory(device, size, accessType),
+    isDevice(true)
 {
-    // todo: check error, check hostmemory
-    hostMemory = aligned_malloc(size, DLM_PAGE_SIZE);
-    devMemory = clCreateBuffer(device.context, accessType, size, nullptr, NULL);
+    cl_int error;
+    void* const hostSiteMem = aligned_malloc(size, DLM_PAGE_SIZE);
+    if (hostSiteMem == nullptr)
+        throw new CLException();
+
+    cl_mem devSiteMem = clCreateBuffer(device.context, accessType, size, nullptr, &error);
+    if (error != CL_SUCCESS) {
+        aligned_free(hostSiteMem);
+        throw new CLException();
+    }
+
+    hostMemory = hostSiteMem;
+    deviceMemory = devSiteMem;
 }
 
 GenericMemory::~GenericMemory(void)
 {
-    aligned_free(hostMemory);
-    clReleaseMemObject(devMemory);
+    if (hostMemory != nullptr)
+        aligned_free(hostMemory);
+    hostMemory = nullptr;
+    clReleaseMemObject(deviceMemory);
 }
 
-void* GenericMemory::switchToHost(cl_command_queue queue)
+void GenericMemory::switchToHost(cl_command_queue queue)
 {
+    if (!isDevice)
+        return;
+    isDevice = false;
+
     if (accessType == CL_MEM_WRITE_ONLY || accessType == CL_MEM_READ_WRITE)
-        clEnqueueReadBuffer(queue, devMemory, CL_TRUE, 0, memsize, hostMemory, 0, NULL, NULL);
-    return hostMemory;
+        clEnqueueReadBuffer(queue, deviceMemory, CL_TRUE, 0, memsize, hostMemory, 0, NULL, NULL);
 };
 
-cl_mem GenericMemory::switchToDevice(cl_command_queue queue)
+void GenericMemory::switchToDevice(cl_command_queue queue)
 {
+    if (isDevice)
+        return;
+    isDevice = true;
+
     if (accessType == CL_MEM_READ_ONLY || accessType == CL_MEM_READ_WRITE)
-        clEnqueueWriteBuffer(queue, devMemory, CL_TRUE, 0, memsize, hostMemory, 0, NULL, NULL);
-    return devMemory;
+        clEnqueueWriteBuffer(queue, deviceMemory, CL_TRUE, 0, memsize, hostMemory, 0, NULL, NULL);
 };

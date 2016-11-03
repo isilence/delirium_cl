@@ -33,7 +33,8 @@ double testCopy(dlmcl::Device& dev, dlmcl::Memory* mem)
 
     Timer t;
     for (int i=0; i<itCount; ++i) {
-        void* buffer = mem->switchToHost(queue);
+        mem->switchToHost(queue);
+        void* buffer = mem->getMemHost();
         memcpy(tmp, buffer, mem->getSize());
         memset(buffer, (unsigned int)0xdeadbeef, mem->getSize()); //-V575
         mem->switchToDevice(queue);
@@ -60,18 +61,22 @@ double testSq(dlmcl::Device& dev, dlmcl::Memory* in, dlmcl::Memory* out, size_t 
     clFinish(queue);
     Timer t;
     for (int it = 0; it < itCount; ++it) {
-        void* inMem = in->switchToHost(queue);
+        in->switchToHost(queue);
+        void* inMem = in->getMemHost();
         memset(inMem, (unsigned int)0xdeadbeef, in->getSize()); //-V575
 
-        cl_mem devIn = in->switchToDevice(queue);
+        in->switchToDevice(queue);
+        cl_mem devIn = in->getMemDevice();
         checkErrorEx(errcode = clSetKernelArg(prg.kernel, 0, sizeof(devIn), &devIn););
 
-        cl_mem devOut = out->switchToDevice(queue);
+        out->switchToDevice(queue);
+        cl_mem devOut = out->getMemDevice();
         checkErrorEx(errcode = clSetKernelArg(prg.kernel, 1, sizeof(devOut), &devOut););
 
         errcode = clEnqueueNDRangeKernel(queue, prg.kernel, 1, NULL, &n, locSz, 0, NULL, NULL);
         checkError(clEnqueueNDRangeKernel);
-        void* res = out->switchToHost(queue);
+        out->switchToHost(queue);
+        void* res = out->getMemHost();
         memcpy(tmp, res, out->getSize());
     }
     clFinish(queue);
