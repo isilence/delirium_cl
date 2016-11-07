@@ -56,7 +56,6 @@ public:
 };
 
 #ifndef DLM_CL_SKIP_DEVICE_AMD
-
     struct DeviceInfoAMD {
         static void initDeviceInfo(const cl_device_id device, DeviceInfo& deviceInfo);
         static bool isSupportDeviceMemory(const cl_device_id device);

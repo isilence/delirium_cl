@@ -42,7 +42,7 @@ void DeviceInfo::initDeviceType(void)
 
     if (clDeviceType == CL_DEVICE_TYPE_CPU)
         type = DT_CPU;
-    else if (clDeviceType != CL_DEVICE_TYPE_GPU && clDeviceType != CL_DEVICE_TYPE_ACCELERATOR)
+    else if (clDeviceType == CL_DEVICE_TYPE_GPU || clDeviceType == CL_DEVICE_TYPE_ACCELERATOR)
         type = DT_GPU;
 }
 

@@ -21,20 +21,5 @@ void printDeviceInfo(Device& device) {
         printf(" .%d %-11s: %s\n", j+1, attributeNames[j], info);
         free(info);
     }
-
-    // Extensions
-    // get platform attribute value size
-    //clGetDeviceInfo(device.device, CL_DEVICE_EXTENSIONS, 0, NULL, &infoSize);
-    //info = (char*) malloc(infoSize);
-
-    // get platform attribute value
-    // clGetDeviceInfo(clDevice, CL_DEVICE_EXTENSIONS, infoSize, info, NULL);
-
-    // printf(" .%d %-11s: %s\n", 0, "dev ext", info);
-    //free(info);
 }
-
-// ===========================================================
-//  init / release
-
 

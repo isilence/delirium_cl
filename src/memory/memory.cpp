@@ -22,6 +22,9 @@ bool Memory::isAccessTypeValid(const cl_mem_flags accessType)
 Memory* Memory::getOptimal(Device& dev, size_t size, cl_mem_flags clMemType)
 {
     if (dev.info.type == DT_CPU || dev.info.type == DT_IGPU) {
+        //if (clMemType == CL_MEM_READ_ONLY && dev.info.supportMemoryType(MT_DEVICE))
+        //    return new DeviceMemory(dev, size, clMemType);
+
         return new HostMemory(dev, size, clMemType);
     }
 

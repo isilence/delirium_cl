@@ -26,6 +26,11 @@ protected:
     static bool isAccessTypeValid(const cl_mem_flags accessType);
 
 public:
+    enum DLM_MEMORY_CONTEXT_TYPE {
+        MCT_HOST,
+        MCT_DEVICE
+    };
+
     Memory(const Memory&) = delete;
     Memory(Device& device, size_t size, cl_mem_flags accessType) :
         device(device),
@@ -40,8 +45,9 @@ public:
     virtual void switchToHost(cl_command_queue queue) = 0;
     virtual void switchToDevice(cl_command_queue queue) = 0;
 
+
     // ================
-    // partial impl
+    //  helpers
 
     inline size_t getSize() const
     {
@@ -53,14 +59,22 @@ public:
         return accessType;
     }
 
-    inline cl_mem getMemDevice(void)
+    inline cl_mem getDeviceMemory(void)
     {
         return deviceMemory;
     }
 
-    inline void* getMemHost(void)
+    inline void* getHostMemory(void)
     {
         return hostMemory;
+    }
+
+    inline void switchContext(cl_command_queue queue, enum DLM_MEMORY_CONTEXT_TYPE type)
+    {
+        if (type == MCT_HOST)
+            switchToHost(queue);
+        else
+            switchToDevice(queue);
     }
 
     // ================
@@ -90,7 +104,7 @@ protected:
     bool isDeviceMode;
 
     HostMemory(Device& device): Memory(device, 0, CL_MEM_READ_WRITE), maptype(0), isDeviceMode(true) {}
-    friend class DeviceMemory;
+
 public:
     HostMemory(Device& device, size_t size, cl_mem_flags accessType);
     virtual ~HostMemory();
@@ -102,8 +116,6 @@ public:
 
 class DeviceMemory : public HostMemory
 {
-    bool isDevice;
-
 public:
     DeviceMemory(Device& device, size_t size, cl_mem_flags accessType);
 };
