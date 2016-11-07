@@ -2,6 +2,11 @@
 
 Memory managment library for heterogeneous architectures using OpenCl 
 
+## Requirements
+
+C++11 compiler
+OpenCl SDK + driver
+
 ## Installation
 
 ```
@@ -17,7 +22,6 @@ cd ../
 ## Contributors
 
 Begunkov Pavel (asml.silence@gmail.com)
-
 
 ## References
 

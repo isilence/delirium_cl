@@ -30,6 +30,7 @@ set (SRC_DLM_CL_BASE
     ${DIR_INC}/dlm/cl/device.hpp
     ${DIR_INC}/dlm/cl/deviceInfo.hpp
     ${DIR_INC}/dlm/cl/memory.hpp
+    ${DIR_INC}/dlm/cl/kernel.hpp
 )
 
 source_group("dlm\\cl" FILES ${SRC_DLM_CL_BASE})

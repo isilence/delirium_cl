@@ -6,6 +6,7 @@
 #include "../utils/utils.hpp"
 #include "../utils/tasks.hpp"
 #include "dlm/cl/deviceInfo.hpp"
+#include "dlm/cl/kernel.hpp"
 
 using namespace dlmcl;
 using namespace std;
@@ -15,25 +16,25 @@ void testDevice(cl_device_id device)
     dlmcl::Device dev(device);
     printDeviceInfo(dev);
 
-    //const size_t memsize = 128;
-    //std::cout << "== copy test (ms) ==" << std::endl;
-    //std::cout << "gen: " << Benchmark::run(new SCopy(dev, memsize, MT_GENERIC)) << std::endl;
-    //std::cout << "host: " << Benchmark::run(new SCopy(dev, memsize, MT_HOST)) << std::endl;
+    const size_t memsize = 128;
+    std::cout << "== copy test (ms) ==" << std::endl;
+    std::cout << "gen: " << Benchmark::run(new SCopy(dev, memsize, MT_GENERIC)) << std::endl;
+    std::cout << "host: " << Benchmark::run(new SCopy(dev, memsize, MT_HOST)) << std::endl;
 
     //// grammian
     size_t n = 2*128;
-    //const size_t k = 2*1024;
+    const size_t k = 2*1024;
 
-    //std::cout << "== grammian calc test (ms) ==" << std::endl;
-    //std::cout << "gen to gen: " << Benchmark::run(new Grammian(dev, n, k, MT_GENERIC, MT_GENERIC)) << std::endl;
-    //std::cout << "host to host: " << Benchmark::run(new Grammian(dev, n, k, MT_HOST, MT_HOST)) << std::endl;
-    //std::cout << "host to gen: " << Benchmark::run(new Grammian(dev, n, k, MT_HOST, MT_GENERIC)) << std::endl;
-    //std::cout << "gen to host: " << Benchmark::run(new Grammian(dev, n, k, MT_GENERIC, MT_HOST)) << std::endl;
-    //if (dev.info.supportMemoryType(MT_DEVICE)) {
-    //    std::cout << "dev to gen: " << Benchmark::run(new Grammian(dev, n, k, MT_DEVICE, MT_GENERIC)) << std::endl;
-    //    std::cout << "dev to host: " << Benchmark::run(new Grammian(dev, n, k, MT_DEVICE, MT_HOST)) << std::endl;
-    //}
-    //std::cout << "auto to auto: " << Benchmark::run(new Grammian(dev, n, k, (DLM_MEMORY_TYPE)-1, (DLM_MEMORY_TYPE)-1)) << std::endl;
+    std::cout << "== grammian calc test (ms) ==" << std::endl;
+    std::cout << "gen to gen: " << Benchmark::run(new Grammian(dev, n, k, MT_GENERIC, MT_GENERIC)) << std::endl;
+    std::cout << "host to host: " << Benchmark::run(new Grammian(dev, n, k, MT_HOST, MT_HOST)) << std::endl;
+    std::cout << "host to gen: " << Benchmark::run(new Grammian(dev, n, k, MT_HOST, MT_GENERIC)) << std::endl;
+    std::cout << "gen to host: " << Benchmark::run(new Grammian(dev, n, k, MT_GENERIC, MT_HOST)) << std::endl;
+    if (dev.info.supportMemoryType(MT_DEVICE)) {
+        std::cout << "dev to gen: " << Benchmark::run(new Grammian(dev, n, k, MT_DEVICE, MT_GENERIC)) << std::endl;
+        std::cout << "dev to host: " << Benchmark::run(new Grammian(dev, n, k, MT_DEVICE, MT_HOST)) << std::endl;
+    }
+    std::cout << "auto to auto: " << Benchmark::run(new Grammian(dev, n, k, (DLM_MEMORY_TYPE)-1, (DLM_MEMORY_TYPE)-1)) << std::endl;
 
 
     // squary array

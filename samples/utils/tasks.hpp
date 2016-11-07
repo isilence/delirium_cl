@@ -1,6 +1,7 @@
 #ifndef SAMPLES_TESTS_HPP_
 #define SAMPLES_TESTS_HPP_
 #include "../utils/benchmark.hpp"
+#include "dlm/cl/kernel.hpp"
 
 class Square : public Task
 {
@@ -51,13 +52,7 @@ public:
         memset(memIn->getHostMemory(), (unsigned int)0xdeadbeef, memIn->getSize()); //-V575
 
         // run kernel
-        memIn->switchToDevice(queue);
-        memOut->switchToDevice(queue);
-        cl_mem devOut = memOut->getDeviceMemory();
-        cl_mem devIn = memIn->getDeviceMemory();
-        clSetKernelArg(prg.kernel, 1, sizeof(devOut), &devOut);
-        clSetKernelArg(prg.kernel, 0, sizeof(devIn), &devIn);
-        clEnqueueNDRangeKernel(queue, prg.kernel, 1, NULL, &n, loc, 0, NULL, NULL);
+        dlmcl::runKernel(prg.kernel, queue, 1, &n, loc, memIn, memOut);
 
         // gather results
         memOut->switchToHost(queue);
@@ -110,19 +105,9 @@ public:
         memIn->switchToHost(queue);
         memset(memIn->getHostMemory(), (unsigned int)0xdeadbeef, memIn->getSize()); //-V575
 
-        // prepare kernel data
-        memIn->switchContext(queue, dlmcl::Memory::MCT_DEVICE);
-        memOut->switchContext(queue, dlmcl::Memory::MCT_DEVICE);
-        cl_mem devIn = memIn->getDeviceMemory();
-        cl_mem devOut = memOut->getDeviceMemory();
-
-        clSetKernelArg(prg.kernel, 0, sizeof(devIn), &devIn);
-        clSetKernelArg(prg.kernel, 1, sizeof(devOut), &devOut);
-        clSetKernelArg(prg.kernel, 2, sizeof(k), &k);
-
         // run kernel
         const size_t glob[] = {n, n}, loc[] = {8ul, 8ul};
-        clEnqueueNDRangeKernel(queue, prg.kernel, 2, NULL, glob, loc, 0, NULL, NULL);
+        dlmcl::runKernel(prg.kernel, queue, 2, glob, loc, memIn, memOut, k);
 
         // copy data back
         memOut->switchToHost(queue);
@@ -164,7 +149,7 @@ public:
     virtual void run() override
     {
         mem->switchToHost(queue);
-        //memcpy(tmp, mem->getHostMemory(), mem->getSize());
+        memcpy(tmp, mem->getHostMemory(), mem->getSize());
         memset(mem->getHostMemory(), (unsigned int)0xdeadbeef, mem->getSize()); //-V575
         mem->switchToDevice(queue);
     }
