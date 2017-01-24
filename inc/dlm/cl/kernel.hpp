@@ -58,6 +58,5 @@ cl_int runKernel(   cl_kernel kernel,
     return clEnqueueNDRangeKernel(queue, kernel, dimSize, NULL, globalSize, localSize, 0, NULL, NULL);
 }
 
-
 } // ::dlmcl
 #endif // DLM_CL_KERNEL_HPP_

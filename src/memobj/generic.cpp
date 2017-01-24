@@ -1,4 +1,4 @@
-#include "dlm/cl/memory.hpp"
+#include "dlm/cl/memobj.hpp"
 using namespace dlmcl;
 
 GenericMemory::GenericMemory(   Device& device,

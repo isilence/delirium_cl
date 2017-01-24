@@ -1,4 +1,4 @@
-#include "dlm/cl/memory.hpp"
+#include "dlm/cl/memobj.hpp"
 using namespace dlmcl;
 
 HostMemory::HostMemory(Device& device, size_t size, cl_mem_flags accessType) :

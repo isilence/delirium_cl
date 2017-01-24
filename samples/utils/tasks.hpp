@@ -45,16 +45,12 @@ public:
 
     virtual void run() override
     {
-        static const size_t loc[] = {64ul};
-
-        // fill mem
         memIn->switchToHost(queue);
         memset(memIn->getHostMemory(), (unsigned int)0xdeadbeef, memIn->getSize()); //-V575
 
-        // run kernel
-        dlmcl::runKernel(prg.kernel, queue, 1, &n, loc, memIn, memOut);
+        const size_t loc = 64ul;
+        dlmcl::runKernel(prg.kernel, queue, 1, &n, &loc, memIn, memOut);
 
-        // gather results
         memOut->switchToHost(queue);
         memcpy(tmp, memOut->getHostMemory(), memOut->getSize());
     }
@@ -101,15 +97,12 @@ public:
 
     virtual void run() override
     {
-        // fill buffers
         memIn->switchToHost(queue);
         memset(memIn->getHostMemory(), (unsigned int)0xdeadbeef, memIn->getSize()); //-V575
 
-        // run kernel
         const size_t glob[] = {n, n}, loc[] = {8ul, 8ul};
         dlmcl::runKernel(prg.kernel, queue, 2, glob, loc, memIn, memOut, k);
 
-        // copy data back
         memOut->switchToHost(queue);
         memcpy(tmp, memOut->getHostMemory(), memOut->getSize());
     }

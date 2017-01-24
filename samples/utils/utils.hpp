@@ -2,7 +2,7 @@
 #define INIT_HPP_
 #include <string>
 #include "dlm/cl/device.hpp"
-#include "dlm/cl/memory.hpp"
+#include "dlm/cl/memobj.hpp"
 #include "timer.hpp"
 
 #define checkError(func) \

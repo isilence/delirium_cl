@@ -1,4 +1,4 @@
-#include "dlm/cl/memory.hpp"
+#include "dlm/cl/memobj.hpp"
 using namespace dlmcl;
 
 cl_mem_flags Memory::getMapType(const cl_mem_flags accessType)

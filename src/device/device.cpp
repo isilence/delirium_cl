@@ -10,7 +10,7 @@ cl_platform_id Device::getPlatform(cl_device_id clDevice)
     return clPlatform;
 }
 
-cl_context Device::createSinleContext(cl_device_id clDevice)
+cl_context Device::createIsolatedContext(cl_device_id clDevice)
 {
     cl_int errcode;
     cl_context context = clCreateContext(nullptr, 1, &clDevice, nullptr, nullptr, &errcode);
@@ -22,7 +22,7 @@ cl_context Device::createSinleContext(cl_device_id clDevice)
 void Device::initialize(cl_device_id clDevice)
 {
     cl_platform_id clPlatform = getPlatform(clDevice);
-    cl_context clContext = createSinleContext(clDevice);
+    cl_context clContext = createIsolatedContext(clDevice);
 
     device = clDevice;
     platform = clPlatform;

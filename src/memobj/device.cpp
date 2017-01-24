@@ -1,8 +1,8 @@
 #include "dlm/env/macro.h"
 DLM_CMODULE_START
-#include "amd/cl_ext.h"
+#include "cl/amd_cl_ext.h"
 DLM_CMODULE_END
-#include "dlm/cl/memory.hpp"
+#include "dlm/cl/memobj.hpp"
 using namespace dlmcl;
 
 DeviceMemory::DeviceMemory(Device& device, size_t size, cl_mem_flags type) :

@@ -5,7 +5,7 @@
 #include <memory>
 
 #include "utils.hpp"
-#include "dlm/cl/memory.hpp"
+#include "dlm/cl/memobj.hpp"
 
 class Task
 {

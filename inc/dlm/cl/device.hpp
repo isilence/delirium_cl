@@ -9,7 +9,7 @@ class Device
 {
 protected:
     static cl_platform_id getPlatform(cl_device_id clDevice);
-    static cl_context createSinleContext(cl_device_id clDevice);
+    static cl_context createIsolatedContext(cl_device_id clDevice);
 
     void initialize(cl_device_id device);
     void release(void);

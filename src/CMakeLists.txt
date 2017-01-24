@@ -15,10 +15,10 @@ set(SRC_DLM_ENV
     ${DIR_INC}/dlm/allocator.hpp
 )
 set(SRC_DLM_CL_MEMORY
-    ${DIR_SRC}/memory/generic.cpp
-    ${DIR_SRC}/memory/host.cpp
-    ${DIR_SRC}/memory/device.cpp
-    ${DIR_SRC}/memory/memory.cpp
+    ${DIR_SRC}/memobj/generic.cpp
+    ${DIR_SRC}/memobj/host.cpp
+    ${DIR_SRC}/memobj/device.cpp
+    ${DIR_SRC}/memobj/memobj.cpp
 )
 set(SRC_DLM_CL_DEVICE
     ${DIR_SRC}/device/deviceInfo.cpp
@@ -29,13 +29,13 @@ set (SRC_DLM_CL_BASE
     ${DIR_INC}/dlm/cl/base.hpp
     ${DIR_INC}/dlm/cl/device.hpp
     ${DIR_INC}/dlm/cl/deviceInfo.hpp
-    ${DIR_INC}/dlm/cl/memory.hpp
+    ${DIR_INC}/dlm/cl/memobj.hpp
     ${DIR_INC}/dlm/cl/kernel.hpp
 )
 
 source_group("dlm\\cl" FILES ${SRC_DLM_CL_BASE})
-source_group("dlm\\cl\\dev" FILES ${SRC_DLM_CL_DEVICE})
-source_group("dlm\\cl\\mem" FILES ${SRC_DLM_CL_MEMORY})
+source_group("dlm\\cl\\device" FILES ${SRC_DLM_CL_DEVICE})
+source_group("dlm\\cl\\memobj" FILES ${SRC_DLM_CL_MEMORY})
 source_group("dlm\\env" FILES ${SRC_DLM_ENV})
 
 set(SOURCE_FILES

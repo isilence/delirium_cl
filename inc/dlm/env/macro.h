@@ -21,16 +21,17 @@
 #define DLM_CONCAT(str1, str2)  DLM_CONCAT_(str1, str2)
 
 /* ints */
-#define DLM_SELECT(cond, a, b)  ( (cond) ? (a) : (b) )
-#define DLM_MAX(a, b)           DLM_SELECT( (a)>(b), (a), (b) )
-#define DLM_MIN(a, b)           DLM_SELECT( (a)<(b), (a), (b) )
-#define DLM_BOOL2INT(cond)      DLM_SELECT( (cond), 1, 0)
+#define DLM_SELECT(cond, a, b)  ((cond) ? (a) : (b))
+#define DLM_MAX(a, b)           DLM_SELECT((a)>(b), (a), (b))
+#define DLM_MIN(a, b)           DLM_SELECT((a)<(b), (a), (b))
+#define DLM_BOOL2INT(cond)      DLM_SELECT((cond), 1, 0)
 
 /* bit manipulation */
-#define DLM_BIT_SIZE(num)                   ( sizeof(num) * CHAR_BIT )
-#define DLM_BIT_LOW_MASK(size)              ( (1u << (size)) - 1 )
-#define DLM_BIT_HIGH_BITS(x, offset)        ( (x) >> (offset) )
-#define DLM_EXTRACT_BITS(x, offset, size)   ( DLM_BIT_HIGH_BITS(x, offset) & DLM_BIT_LOW_MASK(size) )
+#define DLM_BIT_SIZE(num)                   (sizeof(num) * CHAR_BIT)
+#define DLM_BIT_LOW_MASK(size)              ((1u << (size)) - 1)
+#define DLM_BIT_HIGH_BITS(x, offset)        ((x) >> (offset))
+#define DLM_EXTRACT_BITS(x, offset, size)   (DLM_BIT_HIGH_BITS(x, offset) & DLM_BIT_LOW_MASK(size))
+
 #define DLM_WRAP_STATEMENT(expr) do { expr } while(0)
 
 #ifdef __cplusplus
