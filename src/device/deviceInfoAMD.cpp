@@ -1,43 +1,51 @@
-#ifndef DLM_CL_SKIP_DEVICE_AMD
+#if !defined(DLM_CL_SKIP_DEVICE_AMD)
 #include "dlm/env/macro.h"
 DLM_CMODULE_START
 #include "cl/amd_cl_ext.h"
 DLM_CMODULE_END
-#include "dlm/cl/device.hpp"
 #include "dlm/cl/deviceInfo.hpp"
 using namespace dlmcl;
 
-bool DeviceInfoAMD::isSupportDeviceMemory(const cl_device_id DLM_UNUSED(device))
+static void initTopology(DeviceInfo& di, const cl_device_id dev) noexcept
 {
-    return true;
+    cl_device_topology_amd top;
+    cl_int err = clGetDeviceInfo(dev, CL_DEVICE_TOPOLOGY_AMD, sizeof(top), &top, NULL);
+    if (err == CL_SUCCESS) {
+        di.top.bus = top.pcie.bus;
+        di.top.dev = top.pcie.device;
+        di.top.fn = top.pcie.function;
+    }
 }
 
-void DeviceInfoAMD::initDeviceInfo(const cl_device_id device, DeviceInfo& deviceInfo)
+static void initMisc(DeviceInfo& di, const cl_device_id dev) noexcept
 {
-    cl_int error;
-
-    if (deviceInfo.type == DT_GPU) {
-        cl_device_topology_amd top;
-        error = clGetDeviceInfo(device, CL_DEVICE_TOPOLOGY_AMD, sizeof(top), &top, NULL);
-        if (error == CL_SUCCESS && top.pcie.bus == 0)
-            deviceInfo.type = DT_IGPU;
-    }
+    cl_int err;
 
     cl_uint wavefront;
-    error = clGetDeviceInfo(device, CL_DEVICE_WAVEFRONT_WIDTH_AMD, sizeof(wavefront), &wavefront, NULL);
-    if (error == CL_SUCCESS)
-        deviceInfo.executionWidth = wavefront;
+    err = clGetDeviceInfo(dev, CL_DEVICE_WAVEFRONT_WIDTH_AMD, sizeof(wavefront), &wavefront, NULL);
+    if (err == CL_SUCCESS)
+        di.comp.waveFront = wavefront;
 
-    cl_uint locBankCnt;
-    error = clGetDeviceInfo(device, CL_DEVICE_LOCAL_MEM_BANKS_AMD, sizeof(locBankCnt), &locBankCnt, NULL);
-    if (error == CL_SUCCESS)
-        deviceInfo.localMemoryBanks = locBankCnt;
+    cl_uint memBankNum;
+    err = clGetDeviceInfo(dev, CL_DEVICE_LOCAL_MEM_BANKS_AMD, sizeof(memBankNum), &memBankNum, NULL);
+    if (err == CL_SUCCESS)
+        di.mem.local.bankNum = memBankNum;
 
-    cl_uint globBankCnt;
-    const cl_int ret = clGetDeviceInfo(device, CL_DEVICE_GLOBAL_MEM_CHANNEL_BANKS_AMD, sizeof(globBankCnt), &globBankCnt, NULL);
-    if (ret == CL_SUCCESS)
-        deviceInfo.globalMemoryBanks = globBankCnt;
+    err = clGetDeviceInfo(dev, CL_DEVICE_GLOBAL_MEM_CHANNEL_BANKS_AMD, sizeof(memBankNum), &memBankNum, NULL);
+    if (err == CL_SUCCESS)
+        di.mem.global.bankNum = memBankNum;
+}
 
+void DeviceInfoFiller::fillAMD(void)
+{
+    initTopology(di, dev);
+    initMisc(di, dev);
+
+    di.mem.supportedTypes |= MT_DEVICE;
+
+    const int CPU_MEM_BUS = 0;
+    if (di.top.bus == CPU_MEM_BUS)
+        di.mem.isSMA = true;
 }
 
 #endif // DLM_CL_SKIP_DEVICE_AMD

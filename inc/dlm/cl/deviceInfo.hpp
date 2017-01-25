@@ -4,7 +4,7 @@
 
 namespace dlmcl {
 
-enum DLM_DEVICE_VENDOR
+enum DEVICE_VENDOR
 {
     CDV_UNKNOWN = 0,
     CDV_AMD,
@@ -12,55 +12,79 @@ enum DLM_DEVICE_VENDOR
     CDV_NVIDIA
 };
 
-enum DLM_DEVICE_TYPE
+enum MEMORY_TYPE
 {
-    DT_UNKNOWN = 0,
-    DT_CPU,
-    DT_GPU,
-    DT_IGPU
+    MT_GENERIC  = 0x1,
+    MT_HOST     = 0x2,
+    MT_DEVICE   = 0x4
 };
 
-enum DLM_MEMORY_TYPE
+struct BusTopology
 {
-    MT_GENERIC = 0,
-    MT_HOST,
-    MT_DEVICE
+    int bus, dev, fn;
 };
 
-class DeviceInfo
+struct MemoryCap
+{
+    cl_ulong size;
+    int bankNum;
+};
+
+struct MemoryInfo
+{
+    MemoryCap global;
+    MemoryCap local;
+
+    cl_ulong cacheSize;
+    cl_ulong cacheLaneWidth;
+
+    int supportedTypes;
+    bool isSMA;
+};
+
+struct ComputeInfo
+{
+    int computeUnitNum;
+    int waveFront;
+    int maxGroup;
+    int maxDim;
+    int simdWidth;
+};
+
+struct DeviceInfo
+{
+    MemoryInfo mem;
+    BusTopology top;
+    ComputeInfo comp;
+
+    cl_device_type type;
+    enum DEVICE_VENDOR vendor;
+};
+
+class DeviceInfoFiller
 {
 protected:
-    cl_device_id device;
+    DeviceInfo& di;
+    const cl_device_id dev;
 
-    void initDeviceVendor(void);
-    void initDeviceType(void);
+    #if !defined(DLM_CL_SKIP_DEVICE_AMD)
+        void fillAMD(void);
+    #endif
+    #if !defined(DLM_CL_SKIP_DEVICE_INTEL)
+        void fillIntel(void);
+    #endif
 
-    void setDefault(void);
-    void initialize(cl_device_id device);
-
-    void operator=(const DeviceInfo&) = delete;
 public:
-    DeviceInfo(void) = delete;
-    DeviceInfo(const DeviceInfo&) = default;
-    explicit DeviceInfo(cl_device_id device) {
-        initialize(device);
-    };
+    DeviceInfoFiller(DeviceInfo& di, cl_device_id dev)
+        :   di(di),
+            dev(dev) {}
 
-    enum DLM_DEVICE_VENDOR  vendor;
-    enum DLM_DEVICE_TYPE    type;
-    cl_uint executionWidth; // 0 - can't determine width
-    cl_uint globalMemoryBanks;
-    cl_uint localMemoryBanks;
+    void fill(void);
 
-    bool supportMemoryType(enum DLM_MEMORY_TYPE memType) const;
+    DeviceInfo& get(void) noexcept {
+        return di;
+    }
 };
-
-#ifndef DLM_CL_SKIP_DEVICE_AMD
-    struct DeviceInfoAMD {
-        static void initDeviceInfo(const cl_device_id device, DeviceInfo& deviceInfo);
-        static bool isSupportDeviceMemory(const cl_device_id device);
-    };
-#endif
 
 
 } // ::dlmcl

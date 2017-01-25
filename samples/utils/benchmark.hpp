@@ -16,7 +16,7 @@ public:
     virtual void run() = 0;
 
 
-    static dlmcl::Memory* constructMemory(dlmcl::Device& dev, size_t size, cl_mem_flags access, enum dlmcl::DLM_MEMORY_TYPE type)
+    static dlmcl::Memory* constructMemory(dlmcl::Device& dev, size_t size, cl_mem_flags access, enum dlmcl::MEMORY_TYPE type)
     {
         using namespace dlmcl;
         if (type == dlmcl::MT_DEVICE)

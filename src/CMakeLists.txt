@@ -21,8 +21,9 @@ set(SRC_DLM_CL_MEMORY
     ${DIR_SRC}/memobj/memobj.cpp
 )
 set(SRC_DLM_CL_DEVICE
-    ${DIR_SRC}/device/deviceInfo.cpp
     ${DIR_SRC}/device/deviceInfoAMD.cpp
+    ${DIR_SRC}/device/deviceInfoGeneric.cpp
+    ${DIR_SRC}/device/deviceInfoIntel.cpp
     ${DIR_SRC}/device/device.cpp
 )
 set (SRC_DLM_CL_BASE

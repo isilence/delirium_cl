@@ -30,11 +30,11 @@ void testDevice(cl_device_id device)
     std::cout << "host to host: " << Benchmark::run(new Grammian(dev, n, k, MT_HOST, MT_HOST)) << std::endl;
     std::cout << "host to gen: " << Benchmark::run(new Grammian(dev, n, k, MT_HOST, MT_GENERIC)) << std::endl;
     std::cout << "gen to host: " << Benchmark::run(new Grammian(dev, n, k, MT_GENERIC, MT_HOST)) << std::endl;
-    if (dev.info.supportMemoryType(MT_DEVICE)) {
+    if (dev.info.mem.supportedTypes & MT_DEVICE) {
         std::cout << "dev to gen: " << Benchmark::run(new Grammian(dev, n, k, MT_DEVICE, MT_GENERIC)) << std::endl;
         std::cout << "dev to host: " << Benchmark::run(new Grammian(dev, n, k, MT_DEVICE, MT_HOST)) << std::endl;
     }
-    std::cout << "auto to auto: " << Benchmark::run(new Grammian(dev, n, k, (DLM_MEMORY_TYPE)-1, (DLM_MEMORY_TYPE)-1)) << std::endl;
+    std::cout << "auto to auto: " << Benchmark::run(new Grammian(dev, n, k, (MEMORY_TYPE)-1, (MEMORY_TYPE)-1)) << std::endl;
 
 
     // squary array
@@ -44,11 +44,11 @@ void testDevice(cl_device_id device)
     std::cout << "host to host: " << Benchmark::run(new Square(dev, n, MT_HOST, MT_HOST)) << std::endl;
     std::cout << "host to gen: " << Benchmark::run(new Square(dev, n, MT_HOST, MT_GENERIC)) << std::endl;
     std::cout << "gen to host: " << Benchmark::run(new Square(dev, n, MT_GENERIC, MT_HOST)) << std::endl;
-    if (dev.info.supportMemoryType(MT_DEVICE)) {
+    if (dev.info.mem.supportedTypes & MT_DEVICE) {
         std::cout << "dev to gen: " << Benchmark::run(new Square(dev, n, MT_DEVICE, MT_GENERIC)) << std::endl;
         std::cout << "dev to host: " << Benchmark::run(new Square(dev, n, MT_DEVICE, MT_HOST)) << std::endl;
     }
-    std::cout << "auto to auto: " << Benchmark::run(new Square(dev, n, (DLM_MEMORY_TYPE)-1, (DLM_MEMORY_TYPE)-1)) << std::endl;
+    std::cout << "auto to auto: " << Benchmark::run(new Square(dev, n, (MEMORY_TYPE)-1, (MEMORY_TYPE)-1)) << std::endl;
 }
 
 int main(void)

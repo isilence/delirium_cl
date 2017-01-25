@@ -9,7 +9,7 @@ class Square : public Task
     size_t n;
     char* tmp;
 
-    dlmcl::DLM_MEMORY_TYPE intype, outtype;
+    dlmcl::MEMORY_TYPE intype, outtype;
 
     cl_command_queue queue;
     Program prg;
@@ -17,7 +17,7 @@ class Square : public Task
 
 
 public:
-    Square(dlmcl::Device& dev, size_t n, dlmcl::DLM_MEMORY_TYPE intype, dlmcl::DLM_MEMORY_TYPE outtype) :
+    Square(dlmcl::Device& dev, size_t n, dlmcl::MEMORY_TYPE intype, dlmcl::MEMORY_TYPE outtype) :
         dev(dev), n(n), intype(intype), outtype(outtype)
     {}
 
@@ -61,14 +61,14 @@ class Grammian : public Task
     dlmcl::Device& dev;
     size_t n, k;
     char* tmp;
-    dlmcl::DLM_MEMORY_TYPE intype, outtype;
+    dlmcl::MEMORY_TYPE intype, outtype;
 
     Program prg;
     cl_command_queue queue;
     dlmcl::Memory *memIn, *memOut;
 
 public:
-    Grammian(dlmcl::Device& dev, size_t n, size_t k, dlmcl::DLM_MEMORY_TYPE intype, dlmcl::DLM_MEMORY_TYPE outtype) :
+    Grammian(dlmcl::Device& dev, size_t n, size_t k, dlmcl::MEMORY_TYPE intype, dlmcl::MEMORY_TYPE outtype) :
         dev(dev), n(n), k(k), intype(intype), outtype(outtype)
     {}
 
@@ -116,10 +116,10 @@ class SCopy : public Task
 
     cl_command_queue queue;
     dlmcl::Memory *mem;
-    dlmcl::DLM_MEMORY_TYPE type;
+    dlmcl::MEMORY_TYPE type;
 
 public:
-    SCopy(dlmcl::Device& dev, size_t n, dlmcl::DLM_MEMORY_TYPE type) :
+    SCopy(dlmcl::Device& dev, size_t n, dlmcl::MEMORY_TYPE type) :
         dev(dev), n(n), type(type)
     {}
     void setSize(size_t _n) {
