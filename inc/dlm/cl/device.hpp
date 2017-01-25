@@ -18,19 +18,11 @@ public:
     Device() = delete;
     Device(const Device&) = delete;
 
-    Device(const Device&& dev) {
-        device = dev.device;
-        context = dev.context;
-        platform = dev.platform;
-        DeviceInfoFiller(info, device).fill();
-    }
-    Device(cl_device_id device)
-    {
-        DeviceInfoFiller(info, device).fill();
+    Device(cl_device_id device) {
         initialize(device);
     }
-    ~Device(void)
-    {
+
+    ~Device(void) {
         release();
     }
 

@@ -4,16 +4,16 @@ using namespace dlmcl;
 GenericMemory::GenericMemory(   Device& device,
                                 const size_t size,
                                 const cl_mem_flags accessType) :
-    Memory(device, size, accessType),
+    Memobj(device, size, accessType),
     isDevice(true)
 {
-    cl_int error;
+    cl_int err;
     void* const hostSiteMem = aligned_malloc(size, DLM_PAGE_SIZE);
     if (hostSiteMem == nullptr)
         throw new CLException();
 
-    cl_mem devSiteMem = clCreateBuffer(device.context, accessType, size, nullptr, &error);
-    if (error != CL_SUCCESS) {
+    cl_mem devSiteMem = clCreateBuffer(device.context, accessType, size, nullptr, &err);
+    if (err != CL_SUCCESS) {
         aligned_free(hostSiteMem);
         throw new CLException();
     }

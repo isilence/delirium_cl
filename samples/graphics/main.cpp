@@ -10,7 +10,7 @@
 using namespace dlmcl;
 using namespace std;
 
-enum DLM_MEMORY_TYPE types[] = {MT_GENERIC, MT_HOST, MT_DEVICE};
+enum MEMORY_TYPE types[] = {MT_GENERIC, MT_HOST, MT_DEVICE};
 const char* typeNames[] = {"generic", "host", "device"};
 
 string getVendorName(Device& dev)
@@ -38,7 +38,7 @@ string getDeviceName(Device& dev)
     return res;
 }
 
-void generateCopyData(Device& dev, enum DLM_MEMORY_TYPE type, const char* typeName)
+void generateCopyData(Device& dev, enum MEMORY_TYPE type, const char* typeName)
 {
     if (type == MT_DEVICE)
         return;
@@ -54,7 +54,7 @@ void generateCopyData(Device& dev, enum DLM_MEMORY_TYPE type, const char* typeNa
 }
 
 
-void generateGramData(Device& dev, enum DLM_MEMORY_TYPE type1, enum DLM_MEMORY_TYPE type2, const char* typeName1, const char* typeName2)
+void generateGramData(Device& dev, enum MEMORY_TYPE type1, enum MEMORY_TYPE type2, const char* typeName1, const char* typeName2)
 {
     if (type2 == MT_DEVICE)
         return;
@@ -70,7 +70,7 @@ void generateGramData(Device& dev, enum DLM_MEMORY_TYPE type1, enum DLM_MEMORY_T
     }
 }
 
-void generateSqData(Device& dev, enum DLM_MEMORY_TYPE type1, enum DLM_MEMORY_TYPE type2, const char* typeName1, const char* typeName2)
+void generateSqData(Device& dev, enum MEMORY_TYPE type1, enum MEMORY_TYPE type2, const char* typeName1, const char* typeName2)
 {
     if (type2 == MT_DEVICE)
         return;
@@ -91,21 +91,21 @@ void testDevice(cl_device_id device)
     dlmcl::Device dev(device);
 
     for (size_t i=0; i<sizeof(types)/sizeof(types[0]); ++i)
-        if (dev.info.supportMemoryType(types[i]))
+        if (dev.info.mem.supportedTypes & types[i])
             generateCopyData(dev, types[i], typeNames[i]);
-    generateCopyData(dev, (DLM_MEMORY_TYPE)-1, "auto");
+    generateCopyData(dev, (MEMORY_TYPE)-1, "auto");
 
     for (size_t i=0; i<sizeof(types)/sizeof(types[0]); ++i)
         for (size_t j=0; j<sizeof(types)/sizeof(types[0]); ++j)
-            if (dev.info.supportMemoryType(types[j]) && dev.info.supportMemoryType(types[i]))
+            if ((dev.info.mem.supportedTypes & types[i]) && (dev.info.mem.supportedTypes & types[j]))
                 generateGramData(dev, types[i], types[j], typeNames[i], typeNames[j]);
-    generateGramData(dev, (DLM_MEMORY_TYPE)-1, (DLM_MEMORY_TYPE)-1, "auto", "auto");
+    generateGramData(dev, (MEMORY_TYPE)-1, (MEMORY_TYPE)-1, "auto", "auto");
 
     for (size_t i=0; i<sizeof(types)/sizeof(types[0]); ++i)
         for (size_t j=0; j<sizeof(types)/sizeof(types[0]); ++j)
-            if (dev.info.supportMemoryType(types[j]) && dev.info.supportMemoryType(types[i]))
+            if ((dev.info.mem.supportedTypes & types[i]) && (dev.info.mem.supportedTypes & types[j]))
                 generateSqData(dev, types[i], types[j], typeNames[i], typeNames[j]);
-    generateSqData(dev, (DLM_MEMORY_TYPE)-1, (DLM_MEMORY_TYPE)-1, "auto", "auto");
+    generateSqData(dev, (MEMORY_TYPE)-1, (MEMORY_TYPE)-1, "auto", "auto");
 }
 
 int main(void)

@@ -27,6 +27,8 @@ void Device::initialize(cl_device_id clDevice)
     device = clDevice;
     platform = clPlatform;
     context = clContext;
+
+    DeviceInfoFiller(info, device).fill();
 }
 
 void Device::release(void)

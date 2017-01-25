@@ -15,30 +15,33 @@ public:
     virtual void release() = 0;
     virtual void run() = 0;
 
-
-    static dlmcl::Memory* constructMemory(dlmcl::Device& dev, size_t size, cl_mem_flags access, enum dlmcl::MEMORY_TYPE type)
+    static dlmcl::Memobj* constructMemory(dlmcl::Device& dev, size_t size, cl_mem_flags access, enum dlmcl::MEMORY_TYPE type)
     {
         using namespace dlmcl;
-        if (type == dlmcl::MT_DEVICE)
-            return new DeviceMemory(dev, size, access);
-        if (type == dlmcl::MT_GENERIC)
+        switch (type)
+        {
+        case dlmcl::MT_GENERIC:
             return new GenericMemory(dev, size, access);
-        if (type == dlmcl::MT_HOST)
+        case dlmcl::MT_HOST:
             return new HostMemory(dev, size, access);
-        return dlmcl::Memory::getOptimal(dev, size, access);
+        case dlmcl::MT_DEVICE:
+            return new DeviceMemory(dev, size, access);
+        default:
+            return Memobj::getOptimal(dev, size, access);
+        }
     }
 };
 
 class Benchmark {
 public:
-    static double run(Task* task)
+    static double run(Task* task, size_t maxItNum = 500, double maxTime = 4000.0)
     {
         double dt = 0.0;
         size_t itCnt = 0;
         Timer t;
 
         task->initialize();
-        while (itCnt < 500 && dt < 4000.0)
+        while (itCnt < maxItNum && dt < maxTime)
         {
             t.start();
             for (int i=0; i<30; ++i)

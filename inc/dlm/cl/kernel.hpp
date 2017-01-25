@@ -25,10 +25,10 @@ inline
 cl_int setKernelArguments(  cl_command_queue queue,
                             cl_kernel kernel,
                             size_t num,
-                            Memory* mem,
+                            Memobj* mem,
                             Args... xs)
 {
-    mem->switchContext(queue, Memory::MCT_DEVICE);
+    mem->switchContext(queue, Memobj::MCT_DEVICE);
     cl_mem clMem = mem->getDeviceMemory();
     return setKernelArguments(queue, kernel, num, clMem, xs...);
 }

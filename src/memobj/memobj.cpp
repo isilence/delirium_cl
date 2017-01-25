@@ -1,7 +1,7 @@
 #include "dlm/cl/memobj.hpp"
 using namespace dlmcl;
 
-cl_mem_flags Memory::getMapType(const cl_mem_flags accessType)
+cl_mem_flags Memobj::getMapType(const cl_mem_flags accessType)
 {
      switch (accessType) {
         case CL_MEM_READ_ONLY:
@@ -12,21 +12,17 @@ cl_mem_flags Memory::getMapType(const cl_mem_flags accessType)
     return CL_MAP_READ | CL_MAP_WRITE;
 }
 
-bool Memory::isAccessTypeValid(const cl_mem_flags accessType)
+bool Memobj::isAccessTypeValid(const cl_mem_flags accessType)
 {
     return  accessType == CL_MEM_READ_WRITE ||
             accessType == CL_MEM_READ_ONLY ||
             accessType == CL_MEM_WRITE_ONLY;
 }
 
-Memory* Memory::getOptimal(Device& dev, size_t size, cl_mem_flags clMemType)
+Memobj* Memobj::getOptimal(Device& dev, size_t size, cl_mem_flags clMemType)
 {
-    if (dev.info.mem.isSMA) {
-        //if (clMemType == CL_MEM_READ_ONLY && dev.info.supportMemoryType(MT_DEVICE))
-        //    return new DeviceMemory(dev, size, clMemType);
-
+    if (dev.info.mem.isSMA)
         return new HostMemory(dev, size, clMemType);
-    }
 
     switch (clMemType) {
         case CL_MEM_READ_ONLY:

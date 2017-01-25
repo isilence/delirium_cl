@@ -33,12 +33,8 @@ std::string loadFile(const std::string path) {
 
 std::string getOptOptions(dlmcl::Device& dev)
 {
-    int vec_width;
-    cl_uint cacheSize;
-    cl_uint compUnits;
+    cl_uint vec_width;
     clGetDeviceInfo(dev.device, CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT, sizeof(vec_width), &vec_width, NULL);
-    clGetDeviceInfo(dev.device, CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE, sizeof(cacheSize), &cacheSize, NULL);
-    clGetDeviceInfo(dev.device, CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(compUnits), &compUnits, NULL);
 
     #define BLOCK_SIZE 8
     #define BLOCK_SIDEX 8
@@ -88,4 +84,3 @@ void releaseProgram(Program p) {
     clReleaseKernel(p.kernel);
     clReleaseProgram(p.program);
 }
-

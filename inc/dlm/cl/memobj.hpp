@@ -1,5 +1,5 @@
-#ifndef DLM_CL_MEMORY_HPP_
-#define DLM_CL_MEMORY_HPP_
+#ifndef DLM_CL_MEMOBJ_HPP_
+#define DLM_CL_MEMOBJ_HPP_
 #include <stddef.h>
 
 #include "dlm/env/system.h"
@@ -10,9 +10,7 @@
 
 namespace dlmcl {
 
-
-
-class Memory
+class Memobj
 {
 protected:
     Device& device;
@@ -26,13 +24,13 @@ protected:
     static bool isAccessTypeValid(const cl_mem_flags accessType);
 
 public:
-    enum DLM_MEMORY_CONTEXT_TYPE {
+    enum MEMORY_CONTEXT_TYPE {
         MCT_HOST,
         MCT_DEVICE
     };
 
-    Memory(const Memory&) = delete;
-    Memory(Device& device, size_t size, cl_mem_flags accessType) :
+    Memobj(const Memobj&) = delete;
+    Memobj(Device& device, size_t size, cl_mem_flags accessType) :
         device(device),
         memsize(size),
         accessType(accessType),
@@ -41,13 +39,10 @@ public:
         if (!isAccessTypeValid(accessType))
             throw new CLException();
     }
-    virtual ~Memory(void) {};
+    virtual ~Memobj(void) {};
     virtual void switchToHost(cl_command_queue queue) = 0;
     virtual void switchToDevice(cl_command_queue queue) = 0;
 
-
-    // ================
-    //  helpers
 
     inline size_t getSize() const
     {
@@ -69,7 +64,7 @@ public:
         return hostMemory;
     }
 
-    inline void switchContext(cl_command_queue queue, enum DLM_MEMORY_CONTEXT_TYPE type)
+    inline void switchContext(cl_command_queue queue, enum MEMORY_CONTEXT_TYPE type)
     {
         if (type == MCT_HOST)
             switchToHost(queue);
@@ -77,14 +72,10 @@ public:
             switchToDevice(queue);
     }
 
-    // ================
-    // static api
-
-    static Memory* getOptimal(Device& dev, size_t size, cl_mem_flags accessType);
-
+    static Memobj* getOptimal(Device& dev, size_t size, cl_mem_flags accessType);
 };
 
-class GenericMemory : public Memory
+class GenericMemory : public Memobj
 {
     bool isDevice;
 
@@ -97,13 +88,13 @@ public:
 };
 
 
-class HostMemory : public Memory
+class HostMemory : public Memobj
 {
 protected:
     cl_mem_flags maptype;
     bool isDeviceMode;
 
-    HostMemory(Device& device): Memory(device, 0, CL_MEM_READ_WRITE), maptype(0), isDeviceMode(true) {}
+    HostMemory(Device& device): Memobj(device, 0, CL_MEM_READ_WRITE), maptype(0), isDeviceMode(true) {}
 
 public:
     HostMemory(Device& device, size_t size, cl_mem_flags accessType);
@@ -121,4 +112,4 @@ public:
 };
 
 } // ::dlmcl
-#endif // DLM_CL_MEMORY_HPP_
+#endif // DLM_CL_MEMOBJ_HPP_

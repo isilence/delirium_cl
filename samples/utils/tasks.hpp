@@ -13,7 +13,7 @@ class Square : public Task
 
     cl_command_queue queue;
     Program prg;
-    dlmcl::Memory *memIn, *memOut;
+    dlmcl::Memobj *memIn, *memOut;
 
 
 public:
@@ -65,7 +65,7 @@ class Grammian : public Task
 
     Program prg;
     cl_command_queue queue;
-    dlmcl::Memory *memIn, *memOut;
+    dlmcl::Memobj *memIn, *memOut;
 
 public:
     Grammian(dlmcl::Device& dev, size_t n, size_t k, dlmcl::MEMORY_TYPE intype, dlmcl::MEMORY_TYPE outtype) :
@@ -115,7 +115,7 @@ class SCopy : public Task
     size_t n;
 
     cl_command_queue queue;
-    dlmcl::Memory *mem;
+    dlmcl::Memobj *mem;
     dlmcl::MEMORY_TYPE type;
 
 public:

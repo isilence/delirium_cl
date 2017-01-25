@@ -2,7 +2,7 @@
 using namespace dlmcl;
 
 HostMemory::HostMemory(Device& device, size_t size, cl_mem_flags accessType) :
-    Memory(device, size, accessType),
+    Memobj(device, size, accessType),
     isDeviceMode(true)
 {
     cl_int error;
@@ -11,7 +11,7 @@ HostMemory::HostMemory(Device& device, size_t size, cl_mem_flags accessType) :
         throw new CLException();
 
     hostMemory = nullptr;
-    maptype = Memory::getMapType(accessType);
+    maptype = Memobj::getMapType(accessType);
 }
 
 HostMemory::~HostMemory()
@@ -25,9 +25,9 @@ void HostMemory::switchToHost(cl_command_queue queue)
         return;
     isDeviceMode = false;
 
-    cl_int error;
-    void* hostSiteMemory = clEnqueueMapBuffer(queue, deviceMemory, CL_TRUE, maptype, 0, memsize, 0, NULL, NULL, &error);
-    if (error != CL_SUCCESS)
+    cl_int err;
+    void* hostSiteMemory = clEnqueueMapBuffer(queue, deviceMemory, CL_TRUE, maptype, 0, memsize, 0, NULL, NULL, &err);
+    if (err != CL_SUCCESS)
         throw new CLException();
 
     hostMemory = hostSiteMemory;
