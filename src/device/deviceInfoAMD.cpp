@@ -1,7 +1,7 @@
 #if !defined(DLM_CL_SKIP_DEVICE_AMD)
 #include "dlm/env/macro.h"
 DLM_CMODULE_START
-#include "cl/amd_cl_ext.h"
+#include "cl/cl_ext_amd.h"
 DLM_CMODULE_END
 #include "dlm/cl/deviceInfo.hpp"
 using namespace dlmcl;

@@ -73,6 +73,9 @@ protected:
     #if !defined(DLM_CL_SKIP_DEVICE_INTEL)
         void fillIntel(void);
     #endif
+    #if !defined(DLM_CL_SKIP_DEVICE_NVIDIA)
+        void fillNvidia(void);
+    #endif
 
 public:
     DeviceInfoFiller(DeviceInfo& di, cl_device_id dev)

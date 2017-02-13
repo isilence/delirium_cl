@@ -13,7 +13,7 @@ using namespace std;
 
 void testDevice(cl_device_id device)
 {
-    dlmcl::Device dev(device);
+    Device dev(device);
     printDeviceInfo(dev);
 
     cout    << "CU num: " << dev.info.comp.computeUnitNum << std::endl

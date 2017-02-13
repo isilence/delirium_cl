@@ -24,6 +24,7 @@ set(SRC_DLM_CL_DEVICE
     ${DIR_SRC}/device/deviceInfoAMD.cpp
     ${DIR_SRC}/device/deviceInfoGeneric.cpp
     ${DIR_SRC}/device/deviceInfoIntel.cpp
+    ${DIR_SRC}/device/deviceInfoNvidia.cpp
     ${DIR_SRC}/device/device.cpp
 )
 set (SRC_DLM_CL_BASE
