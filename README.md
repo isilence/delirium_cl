@@ -1,31 +1,54 @@
-## Synopsis
+## dlmCL
 
-Memory managment library for heterogeneous architectures using OpenCl 
+_dlmCl_ is C++ host-side library for OpenCL designed to optimize CPU-GPU data transfers by utilizing features of modern hardware memory architectures.  
+Its API provides methods for cross-platform runtime architecture detection and dedicated memory abstraction.  
+_dlmCl_ is a support library rather than a complete computing framework, therefore it have low-level primitives that should be used in conjunction with raw OpenCL API.  
 
-## Requirements
+### Prerequisites
 
-C++11 compiler
-OpenCl SDK + driver
+* C++11 compiler
+* OpenCL 1.2+ SDK
+* CMake 3.6+
 
-## Installation
+### Installation
 
-```
-cd <project_dir>
-mkdir build
-cd ./build
-cmake ../
-make 
-cd ../
-# ./bin/benchmark # run example
+```bash
+mkdir build && cd ./build
+cmake ../ && make
 ```
 
-## Contributors
+### Example
 
-Begunkov Pavel (asml.silence@gmail.com)
+```c++
+// OpenCL objects and kernel params
+size_t loc, n;
+cl_device_id cl_device;
+cl_command_queue queue;
+cl_kernel kernel;
+...
 
-## References
+// initialize device & memory object
+dlmcl::Device dev(cl_device);
+dlmcl::Memobj mem = dlmcl::Memobj::getOptimal(dev, n, CL_MEM_READ_WRITE);
 
-http://developer.amd.com/tools-and-sdks/opencl-zone/amd-accelerated-parallel-processing-app-sdk/opencl-optimization-guide/
-http://free.eol.cn/edu_net/edudown/AMDppt/OpenCL%20Programming%20and%20Optimization%20-%20Part%20II.pdf
-http://www.nvidia.com/content/GTC/documents/1068_GTC09.pdf
-https://software.intel.com/en-us/iocl_opg 
+// gather output data
+mem->switchToHost(queue);
+void* mem_ptr = mem->getHostMemory();
+...
+
+// run kernel
+mem->switchToDevice(queue);
+cl_mem mem_dev = src->getDeviceMemory();
+clSetKernelArg(kernel, 0, sizeof mem_dev, &mem_dev);
+clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &n, loc, 0, NULL, NULL);
+clFinish(queue);
+
+// gather output data
+mem->switchToHost(queue);
+void* ptr = mem->getHostMemory();
+```
+
+### Contributors
+
+Pavel Begunkov (asml.silence@gmail.com)
+
