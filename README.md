@@ -7,8 +7,8 @@ _dlmCl_ is a support library rather than a complete computing framework, therefo
 ### Prerequisites
 
 * C++11 compiler
-* OpenCL 1.2+ SDK
-* CMake 3.6+
+* OpenCL 1.2 SDK
+* CMake 2.6
 
 ### Installation
 
