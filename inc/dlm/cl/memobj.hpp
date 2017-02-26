@@ -1,5 +1,6 @@
 #ifndef DLM_CL_MEMOBJ_HPP_
 #define DLM_CL_MEMOBJ_HPP_
+#pragma once
 #include <stddef.h>
 
 #include "dlm/env/system.h"

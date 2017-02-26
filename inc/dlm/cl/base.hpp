@@ -1,5 +1,6 @@
 #ifndef DLM_CL_BASE_HPP_
 #define DLM_CL_BASE_HPP_
+#pragma once
 #include "dlm/env/macro.h"
 
 DLM_CMODULE_START

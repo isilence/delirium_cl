@@ -1,5 +1,6 @@
 #ifndef DLM_CL_DEVICE_HPP_
 #define DLM_CL_DEVICE_HPP_
+#pragma once
 #include "dlm/cl/base.hpp"
 #include "dlm/cl/deviceInfo.hpp"
 

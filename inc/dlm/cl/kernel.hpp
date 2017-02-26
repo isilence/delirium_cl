@@ -1,5 +1,6 @@
 #ifndef DLM_CL_KERNEL_HPP_
 #define DLM_CL_KERNEL_HPP_
+#pragma once
 #include "dlm/cl/base.hpp"
 
 namespace dlmcl {

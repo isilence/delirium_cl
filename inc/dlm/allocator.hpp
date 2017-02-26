@@ -1,5 +1,6 @@
 #ifndef DLM_ALLOCATOR_HPP_
 #define DLM_ALLOCATOR_HPP_
+#pragma once
 #include <limits.h>
 
 

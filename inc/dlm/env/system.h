@@ -11,6 +11,7 @@
 
 #ifndef DLM_ENV_SYSTEM_H_
 #define DLM_ENV_SYSTEM_H_
+#pragma once
 
 #if defined(linux) || defined(__linux) || defined(__linux__)
     #define DLM_OS_LINUX 1

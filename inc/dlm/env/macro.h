@@ -12,6 +12,7 @@
 
 #ifndef DLM_ENV_MACRO_H_
 #define DLM_ENV_MACRO_H_
+#pragma once
 #include <limits.h>
 
 /* string manipulations */
