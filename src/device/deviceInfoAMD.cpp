@@ -9,7 +9,7 @@ using namespace dlmcl;
 static void initTopology(DeviceInfo& di, const cl_device_id dev) noexcept
 {
     cl_device_topology_amd top;
-    cl_int err = clGetDeviceInfo(dev, CL_DEVICE_TOPOLOGY_AMD, sizeof(top), &top, NULL);
+    const cl_int err = clGetDeviceInfo(dev, CL_DEVICE_TOPOLOGY_AMD, sizeof(top), &top, NULL);
     if (err == CL_SUCCESS) {
         di.top.bus = top.pcie.bus;
         di.top.dev = top.pcie.device;
@@ -36,7 +36,7 @@ static void initMisc(DeviceInfo& di, const cl_device_id dev) noexcept
         di.mem.global.bankNum = memBankNum;
 }
 
-void DeviceInfoFiller::fillAMD(void)
+void DeviceInfoFiller::fillAMD(void) noexcept
 {
     initTopology(di, dev);
     initMisc(di, dev);

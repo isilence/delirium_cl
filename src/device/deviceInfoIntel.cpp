@@ -6,7 +6,7 @@ DLM_CMODULE_END
 #include "dlm/cl/deviceInfo.hpp"
 using namespace dlmcl;
 
-void DeviceInfoFiller::fillIntel(void)
+void DeviceInfoFiller::fillIntel(void) noexcept
 {
     if (di.type & CL_DEVICE_TYPE_GPU)
         di.mem.isSMA = true;

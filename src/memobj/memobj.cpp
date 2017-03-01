@@ -1,18 +1,19 @@
 #include "dlm/cl/memobj.hpp"
 using namespace dlmcl;
 
-cl_mem_flags Memobj::getMapType(const cl_mem_flags accessType)
+cl_mem_flags Memobj::getMapType(const cl_mem_flags accessType) noexcept
 {
      switch (accessType) {
         case CL_MEM_READ_ONLY:
             return CL_MAP_READ;
         case CL_MEM_WRITE_ONLY:
             return CL_MAP_WRITE;
+        default:
+            return CL_MAP_READ | CL_MAP_WRITE;
     }
-    return CL_MAP_READ | CL_MAP_WRITE;
 }
 
-bool Memobj::isAccessTypeValid(const cl_mem_flags accessType)
+bool Memobj::isAccessTypeValid(const cl_mem_flags accessType) noexcept
 {
     return  accessType == CL_MEM_READ_WRITE ||
             accessType == CL_MEM_READ_ONLY ||

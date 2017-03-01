@@ -69,21 +69,22 @@ protected:
     const cl_device_id dev;
 
     #if !defined(DLM_CL_SKIP_DEVICE_AMD)
-        void fillAMD(void);
+        void fillAMD(void) noexcept;
     #endif
     #if !defined(DLM_CL_SKIP_DEVICE_INTEL)
-        void fillIntel(void);
+        void fillIntel(void) noexcept;
     #endif
     #if !defined(DLM_CL_SKIP_DEVICE_NVIDIA)
-        void fillNvidia(void);
+        void fillNvidia(void) noexcept;
     #endif
 
 public:
     DeviceInfoFiller(DeviceInfo& di, cl_device_id dev)
-        :   di(di),
-            dev(dev) {}
+        : di(di)
+        , dev(dev)
+    {}
 
-    void fill(void);
+    void fill(void) noexcept;
 
     DeviceInfo& get(void) noexcept {
         return di;

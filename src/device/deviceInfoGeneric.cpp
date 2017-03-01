@@ -82,7 +82,7 @@ static void setComputeUnitInfo(DeviceInfo& di, const cl_device_id dev) noexcept
     size_t maxGroupSize;
     err = clGetDeviceInfo(dev, CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(maxGroupSize), &maxGroupSize, nullptr);
     if (err == CL_SUCCESS)
-        di.comp.maxGroup = maxGroupSize;
+        di.comp.maxGroup = (int)maxGroupSize;
 
     cl_uint maxDim;
     err = clGetDeviceInfo(dev, CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, sizeof(maxDim), &maxDim, nullptr);
@@ -91,7 +91,7 @@ static void setComputeUnitInfo(DeviceInfo& di, const cl_device_id dev) noexcept
 }
 
 
-void DeviceInfoFiller::fill(void)
+void DeviceInfoFiller::fill(void) noexcept
 {
     setDefaultInfo(di);
     setDeviceVendor(di, dev);

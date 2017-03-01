@@ -21,8 +21,8 @@ protected:
     cl_mem deviceMemory;
     void* hostMemory;
 
-    static cl_mem_flags getMapType(const cl_mem_flags accessType);
-    static bool isAccessTypeValid(const cl_mem_flags accessType);
+    static cl_mem_flags getMapType(const cl_mem_flags accessType) noexcept;
+    static bool isAccessTypeValid(const cl_mem_flags accessType) noexcept;
 
 public:
     enum MEMORY_CONTEXT_TYPE {
@@ -31,26 +31,26 @@ public:
     };
 
     Memobj(const Memobj&) = delete;
-    Memobj(Device& device, size_t size, cl_mem_flags accessType) :
-        device(device),
-        memsize(size),
-        accessType(accessType),
-        hostMemory(nullptr)
+    Memobj(Device& device, size_t size, cl_mem_flags accessType)
+        : device(device)
+        , memsize(size)
+        , accessType(accessType)
+        , hostMemory(nullptr)
     {
         if (!isAccessTypeValid(accessType))
             throw new CLException();
     }
-    virtual ~Memobj(void) {};
+    virtual ~Memobj(void) noexcept {};
     virtual void switchToHost(cl_command_queue queue) = 0;
     virtual void switchToDevice(cl_command_queue queue) = 0;
 
 
-    inline size_t getSize() const
+    inline size_t getSize() const noexcept
     {
         return memsize;
     }
 
-    inline cl_mem_flags getAccessType() const
+    inline cl_mem_flags getAccessType() const noexcept
     {
         return accessType;
     }
@@ -82,7 +82,7 @@ class GenericMemory : public Memobj
 
 public:
     GenericMemory(Device& device, size_t size, cl_mem_flags accessType);
-    virtual ~GenericMemory();
+    virtual ~GenericMemory() noexcept;
 
     virtual void switchToHost(cl_command_queue queue) override;
     virtual void switchToDevice(cl_command_queue queue) override;
@@ -95,11 +95,15 @@ protected:
     cl_mem_flags maptype;
     bool isDeviceMode;
 
-    HostMemory(Device& device): Memobj(device, 0, CL_MEM_READ_WRITE), maptype(0), isDeviceMode(true) {}
+    HostMemory(Device& device):
+        Memobj(device, 0, CL_MEM_READ_WRITE)
+        , maptype(0)
+        , isDeviceMode(true)
+    {}
 
 public:
     HostMemory(Device& device, size_t size, cl_mem_flags accessType);
-    virtual ~HostMemory();
+    virtual ~HostMemory() noexcept;
 
     virtual void switchToHost(cl_command_queue queue) override;
     virtual void switchToDevice(cl_command_queue queue) override;

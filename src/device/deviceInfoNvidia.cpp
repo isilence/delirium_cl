@@ -6,7 +6,7 @@ DLM_CMODULE_END
 #include "dlm/cl/deviceInfo.hpp"
 using namespace dlmcl;
 
-void DeviceInfoFiller::fillNvidia(void)
+void DeviceInfoFiller::fillNvidia(void) noexcept
 {
     cl_int err;
 

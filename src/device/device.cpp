@@ -4,16 +4,16 @@ using namespace dlmcl;
 cl_platform_id Device::getPlatform(cl_device_id clDevice)
 {
     cl_platform_id clPlatform;
-    cl_int res = clGetDeviceInfo(clDevice, CL_DEVICE_PLATFORM, sizeof(clPlatform), &clPlatform, nullptr);
+    const cl_int res = clGetDeviceInfo(clDevice, CL_DEVICE_PLATFORM, sizeof(clPlatform), &clPlatform, nullptr);
     if (res != CL_SUCCESS)
         throw new CLException();
     return clPlatform;
 }
 
-cl_context Device::createIsolatedContext(cl_device_id clDevice)
+cl_context Device::createIsolatedContext(const cl_device_id clDevice)
 {
     cl_int errcode;
-    cl_context context = clCreateContext(nullptr, 1, &clDevice, nullptr, nullptr, &errcode);
+    const cl_context context = clCreateContext(nullptr, 1, &clDevice, nullptr, nullptr, &errcode);
     if (context == NULL)
         throw CLException();
     return context;
@@ -21,8 +21,8 @@ cl_context Device::createIsolatedContext(cl_device_id clDevice)
 
 void Device::initialize(cl_device_id clDevice)
 {
-    cl_platform_id clPlatform = getPlatform(clDevice);
-    cl_context clContext = createIsolatedContext(clDevice);
+    const cl_platform_id clPlatform = getPlatform(clDevice);
+    const cl_context clContext = createIsolatedContext(clDevice);
 
     device = clDevice;
     platform = clPlatform;
@@ -31,7 +31,7 @@ void Device::initialize(cl_device_id clDevice)
     DeviceInfoFiller(info, device).fill();
 }
 
-void Device::release(void)
+void Device::release(void) noexcept
 {
     clReleaseContext(context);
     clReleaseDevice(device);

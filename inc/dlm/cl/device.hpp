@@ -10,20 +10,22 @@ class Device
 {
 protected:
     static cl_platform_id getPlatform(cl_device_id clDevice);
-    static cl_context createIsolatedContext(cl_device_id clDevice);
+    static cl_context createIsolatedContext(const cl_device_id clDevice);
 
     void initialize(cl_device_id device);
-    void release(void);
+    void release(void) noexcept;
 
 public:
     Device() = delete;
     Device(const Device&) = delete;
 
-    Device(cl_device_id device) {
+    Device(cl_device_id device)
+    {
         initialize(device);
     }
 
-    ~Device(void) {
+    ~Device(void) noexcept
+    {
         release();
     }
 
@@ -32,8 +34,6 @@ public:
     cl_platform_id platform;
     DeviceInfo info;
 };
-
-
 
 } // ::dlmcl
 #endif // DLM_CL_DEVICE_HPP_
