@@ -19,6 +19,8 @@ set(SRC_DLM_CL_MEMORY
     ${DIR_SRC}/memobj/host.cpp
     ${DIR_SRC}/memobj/device.cpp
     ${DIR_SRC}/memobj/memobj.cpp
+    ${DIR_SRC}/memobj/memobjPool.cpp
+    ${DIR_INC}/dlm/cl/memobjPool.hpp
 )
 set(SRC_DLM_CL_DEVICE
     ${DIR_SRC}/device/deviceInfoAMD.cpp
