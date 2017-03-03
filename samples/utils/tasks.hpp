@@ -28,7 +28,7 @@ public:
     virtual void initialize() override
     {
         prg = buildProgram(dev, DLM_SAMPLE_DIR "/kernels/simple.cl", "squareArray");
-        queue = clCreateCommandQueueWithProperties(dev.context, dev.device, nullptr, NULL);
+        queue = clCreateCommandQueue(dev.context, dev.device, 0, nullptr);
 
         memIn = Task::constructMemory(dev, n*sizeof(float), CL_MEM_READ_ONLY, intype);
         memOut = Task::constructMemory(dev, n*sizeof(float), CL_MEM_WRITE_ONLY, outtype);
@@ -80,7 +80,7 @@ public:
     virtual void initialize() override
     {
         prg = buildProgram(dev, DLM_SAMPLE_DIR "/kernels/grammian.cl", "computeGramMrx");
-        queue = clCreateCommandQueueWithProperties(dev.context, dev.device, nullptr, NULL);
+        queue = clCreateCommandQueue(dev.context, dev.device, 0, nullptr);
 
         memIn = Task::constructMemory(dev, n*k*sizeof(float), CL_MEM_READ_ONLY, intype);
         memOut = Task::constructMemory(dev, n*n*sizeof(float), CL_MEM_WRITE_ONLY, outtype);
@@ -128,7 +128,7 @@ public:
 
     virtual void initialize() override
     {
-        queue = clCreateCommandQueueWithProperties(dev.context, dev.device, nullptr, NULL);
+        queue = clCreateCommandQueue(dev.context, dev.device, 0, nullptr);
         mem = Task::constructMemory(dev, 1024*1024*n, CL_MEM_READ_WRITE, type);
         tmp = new char[mem->getSize()];
     }

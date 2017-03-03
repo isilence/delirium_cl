@@ -9,17 +9,14 @@ include_directories(${DIR_INC})
 add_definitions(-DDLM_SAMPLE_DIR="${DIR_SAMPLE}/")
 
 set(SOURCE_FILES
-    ${DIR_SAMPLE}/graphics/main.cpp
+    ${DIR_SAMPLE}/pool/main.cpp
 
-    ${DIR_SAMPLE}/utils/benchmark.hpp
     ${DIR_SAMPLE}/utils/program.cpp
-    ${DIR_SAMPLE}/utils/tasks.hpp
-    ${DIR_SAMPLE}/utils/timer.hpp
     ${DIR_SAMPLE}/utils/utils.hpp
 )
 
-add_executable(data ${SOURCE_FILES})
-target_link_libraries (data ${OpenCL_LIBRARY})
-target_link_libraries (data dlmCl)
+add_executable(pool ${SOURCE_FILES})
+target_link_libraries (pool ${OpenCL_LIBRARY})
+target_link_libraries (pool dlmCl)
 
 
