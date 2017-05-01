@@ -3,37 +3,35 @@
 
 using namespace dlmcl;
 
-static void setDefaultInfo(DeviceInfo& di) noexcept
+static void setDefaultInfo(DeviceInfo& info) noexcept
 {
-    memset((void*)&di, 0, sizeof(di));
-    di.top.bus = -1;
+    memset((void*)&info, 0, sizeof(info));
+    info.topology.bus = -1;
 }
 
-static void setDeviceVendor(DeviceInfo& di, const cl_device_id dev) noexcept
+static void setDeviceVendor(DeviceInfo& info, const cl_device_id dev) noexcept
 {
+    const int MAX_VENDOR_NAME = 50;
+
     static const char VENDOR_NAME_AMD1[] = "Advanced Micro Devices, Inc.";
     static const char VENDOR_NAME_AMD2[] = "AuthenticAMD";
     static const char VENDOR_NAME_INTEL1[] = "GenuineIntel";
     static const char VENDOR_NAME_INTEL2[] = "Intel(R) Corporation";
+    static const char VENDOR_NAME_NVIDIA[] = "NVIDIA Corporation";
 
-    char buffer[50];
-    di.vendor = CDV_UNKNOWN;
+    char buffer[MAX_VENDOR_NAME];
+    info.vendor = CDV_UNKNOWN;
 
     const cl_int error = clGetDeviceInfo(dev, CL_DEVICE_VENDOR, sizeof(buffer), buffer, nullptr);
     if (error != CL_SUCCESS)
         return;
-    if (strcmp(buffer, VENDOR_NAME_AMD1) == 0 ||
-        strcmp(buffer, VENDOR_NAME_AMD2) == 0)
-    {
-        di.vendor = CDV_AMD;
-        return;
-    }
 
-    if (strcmp(buffer, VENDOR_NAME_INTEL1) == 0 ||
-        strcmp(buffer, VENDOR_NAME_INTEL2) == 0)
-    {
-        di.vendor = CDV_INTEL;
-        return;
+    if (strcmp(buffer, VENDOR_NAME_AMD1) == 0 || strcmp(buffer, VENDOR_NAME_AMD2) == 0) {
+        info.vendor = CDV_AMD;
+    } else if (strcmp(buffer, VENDOR_NAME_INTEL1) == 0 || strcmp(buffer, VENDOR_NAME_INTEL2) == 0) {
+        info.vendor = CDV_INTEL;
+    } else if (strcmp(buffer, VENDOR_NAME_NVIDIA) == 0) {
+        info.vendor = CDV_NVIDIA;
     }
 }
 
@@ -109,5 +107,9 @@ void DeviceInfoFiller::fill(void) noexcept
     #if !defined(DLM_CL_SKIP_DEVICE_INTEL)
         if (di.vendor == CDV_INTEL)
             fillIntel();
+    #endif
+    #if !defined(DLM_CL_SKIP_DEVICE_INTEL)
+        if (di.vendor == CDV_NVIDIA)
+            fillNvidia();
     #endif
 }
