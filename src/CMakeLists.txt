@@ -20,6 +20,7 @@ set(SRC_DLM_CL_MEMORY
     ${DIR_SRC}/memobj/device.cpp
     ${DIR_SRC}/memobj/memobj.cpp
     ${DIR_SRC}/memobj/memobjPool.cpp
+
     ${DIR_INC}/dlm/cl/memobjPool.hpp
 )
 set(SRC_DLM_CL_DEVICE
@@ -32,7 +33,6 @@ set(SRC_DLM_CL_DEVICE
 set (SRC_DLM_CL_BASE
     ${DIR_INC}/dlm/cl/base.hpp
     ${DIR_INC}/dlm/cl/device.hpp
-    ${DIR_INC}/dlm/cl/deviceInfo.hpp
     ${DIR_INC}/dlm/cl/memobj.hpp
     ${DIR_INC}/dlm/cl/kernel.hpp
 )

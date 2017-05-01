@@ -1,5 +1,5 @@
 #include <string.h>
-#include "dlm/cl/deviceInfo.hpp"
+#include "dlm/cl/device.hpp"
 
 using namespace dlmcl;
 
@@ -35,81 +35,81 @@ static void setDeviceVendor(DeviceInfo& info, const cl_device_id dev) noexcept
     }
 }
 
-static void setDeviceType(DeviceInfo& di, const cl_device_id dev) noexcept
+static void setDeviceType(DeviceInfo& info, const cl_device_id dev) noexcept
 {
-    cl_int error = clGetDeviceInfo(dev, CL_DEVICE_TYPE, sizeof(di.type), &di.type, nullptr);
-    if (error != CL_SUCCESS)
-        di.type = 0;
+    cl_device_type type;
+    const cl_int error = clGetDeviceInfo(dev, CL_DEVICE_TYPE, sizeof(type), &type, nullptr);
+    info.type = (error == CL_SUCCESS) ? type : 0;
 }
 
-static void setMemoryInfo(DeviceInfo& di, const cl_device_id dev) noexcept
+static void setMemoryInfo(DeviceInfo& info, const cl_device_id dev) noexcept
 {
     cl_int err;
-    di.mem.supportedTypes = MT_GENERIC | MT_HOST;
-    di.mem.isSMA = false;
+    info.memory.supportedTypes = MT_GENERIC | MT_HOST;
+    info.memory.isSMA = false;
 
     cl_ulong cacheSize;
     err = clGetDeviceInfo(dev, CL_DEVICE_GLOBAL_MEM_CACHE_SIZE, sizeof(cacheSize), &cacheSize, nullptr);
     if (err == CL_SUCCESS)
-        di.mem.cacheSize = cacheSize;
+        info.memory.cache.size = cacheSize;
 
     cl_uint laneWidth;
     err = clGetDeviceInfo(dev, CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE, sizeof(laneWidth), &laneWidth, nullptr);
     if (err == CL_SUCCESS)
-        di.mem.cacheLaneWidth = laneWidth;
+        info.memory.cache.width = laneWidth;
 
     cl_ulong size;
     err = clGetDeviceInfo(dev, CL_DEVICE_GLOBAL_MEM_SIZE, sizeof(size), &size, nullptr);
     if (err == CL_SUCCESS)
-        di.mem.global.size = (size_t)size;
+        info.memory.global.size = (size_t)size;
+
     err = clGetDeviceInfo(dev, CL_DEVICE_LOCAL_MEM_SIZE, sizeof(size), &size, nullptr);
     if (err == CL_SUCCESS)
-        di.mem.local.size = size;
+        info.memory.local.size = size;
 }
 
-static void setComputeUnitInfo(DeviceInfo& di, const cl_device_id dev) noexcept
+static void setComputeUnitInfo(DeviceInfo& info, const cl_device_id dev) noexcept
 {
     cl_int err;
-    di.mem.supportedTypes = MT_GENERIC;
+    info.memory.supportedTypes = MT_GENERIC;
 
-    cl_uint cuNum;
-    err = clGetDeviceInfo(dev, CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(cuNum), &cuNum, nullptr);
+    cl_uint computeUniteNum;
+    err = clGetDeviceInfo(dev, CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(computeUniteNum), &computeUniteNum, nullptr);
     if (err == CL_SUCCESS)
-        di.comp.computeUnitNum = cuNum;
+        info.compute.units = computeUniteNum;
 
     size_t maxGroupSize;
     err = clGetDeviceInfo(dev, CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(maxGroupSize), &maxGroupSize, nullptr);
     if (err == CL_SUCCESS)
-        di.comp.maxGroup = (int)maxGroupSize;
+        info.compute.maxGroup = (int)maxGroupSize;
 
     cl_uint maxDim;
     err = clGetDeviceInfo(dev, CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, sizeof(maxDim), &maxDim, nullptr);
     if (err == CL_SUCCESS)
-        di.comp.maxDim = maxDim;
+        info.compute.maxDim = (int)maxDim;
 }
 
-
-void DeviceInfoFiller::fill(void) noexcept
+void DeviceInfoBuilder::fill(void) noexcept
 {
-    setDefaultInfo(di);
-    setDeviceVendor(di, dev);
-    setDeviceType(di, dev);
-    setMemoryInfo(di, dev);
-    setComputeUnitInfo(di, dev);
+    setDefaultInfo(deviceInfo);
+    setDeviceVendor(deviceInfo, dev);
+    setDeviceType(deviceInfo, dev);
+    setMemoryInfo(deviceInfo, dev);
+    setComputeUnitInfo(deviceInfo, dev);
 
-    if (di.type & CL_DEVICE_TYPE_CPU)
-        di.mem.isSMA = true;
+    if (deviceInfo.type & CL_DEVICE_TYPE_CPU)
+        deviceInfo.memory.isSMA = true;
 
     #if !defined(DLM_CL_SKIP_DEVICE_AMD)
-        if (di.vendor == CDV_AMD)
+        if (deviceInfo.vendor == CDV_AMD)
             fillAMD();
     #endif
     #if !defined(DLM_CL_SKIP_DEVICE_INTEL)
-        if (di.vendor == CDV_INTEL)
+        if (deviceInfo.vendor == CDV_INTEL)
             fillIntel();
     #endif
     #if !defined(DLM_CL_SKIP_DEVICE_INTEL)
-        if (di.vendor == CDV_NVIDIA)
+        if (deviceInfo.vendor == CDV_NVIDIA)
             fillNvidia();
     #endif
 }

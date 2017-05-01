@@ -45,6 +45,7 @@ cmake-build*
 .DS_Store
 .AppleDouble
 .LSOverride
+.fuse*
 
 # Icon must end with two \r
 Icon

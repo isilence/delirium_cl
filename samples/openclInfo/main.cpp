@@ -1,53 +1,67 @@
 ﻿#include <string>
-#include <string.h>
-
 #include <iostream>
 #include <fstream>
+
+#include "dlm/cl/device.hpp"
 #include "../utils/utils.hpp"
 #include "../utils/tasks.hpp"
-#include "dlm/cl/deviceInfo.hpp"
-#include "dlm/cl/kernel.hpp"
 
 using namespace dlmcl;
 using namespace std;
+
+void printDeviceName(cl_device_id device, int idx)
+{
+    size_t nameLength;
+    const cl_int errcode = clGetDeviceInfo(device, CL_DEVICE_NAME, 0, NULL, &nameLength);
+    checkError(clGetDeviceInfo);
+
+    char* value = new char[nameLength];
+    clGetDeviceInfo(device, CL_DEVICE_NAME, nameLength, value, NULL);
+    checkError(clGetDeviceInfo);
+
+    std::cout << "Use device #" << idx << " : " << value << std::endl;
+    delete[] value;
+}
 
 void testDevice(cl_device_id device)
 {
     Device dev(device);
     printDeviceInfo(dev);
 
-    cout    << "CU num: " << dev.info.comp.computeUnitNum << std::endl
-            << "is sma: " << dev.info.mem.isSMA << std::endl;
+    cout    << "CU num: " << dev.info.compute.units << std::endl
+            << "is sma: " << dev.info.memory.isSMA << std::endl;
+}
+
+void processPlatform(cl_platform_id platform)
+{
+    const int MAX_DEVICES = 10;
+    cl_device_id devices[MAX_DEVICES];
+    cl_uint devicesNum;
+
+    const cl_int errcode = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 10, devices, &devicesNum);
+    checkError(clGetDeviceIDs);
+    printf("GPGPU devices found: %i\n", (int)devicesNum);
+
+    for (cl_uint idx = 0; idx < devicesNum; ++idx)
+    {
+        printDeviceName(devices[idx], idx);
+        testDevice(devices[idx]);
+        std::cout << "\n=============================\n" << std::endl;
+    }
 }
 
 int main(void)
 {
-    cl_int errcode;
-    cl_platform_id platform[10];
+    const int MAX_PLATFORMS = 10;
+    cl_platform_id platforms[MAX_PLATFORMS];
     cl_uint platformsNum;
-    errcode = clGetPlatformIDs(10, platform, &platformsNum);
+    const cl_int errcode = clGetPlatformIDs(MAX_PLATFORMS, platforms, &platformsNum);
 
     checkError(clGetPlatformIDs);
     printf("OpenCL platforms found: %i\n", (int)platformsNum);
 
-    for (cl_uint platformIdx = 0; platformIdx < platformsNum; ++platformIdx) {
-        cl_device_id devices[10];
-        cl_uint devicesNum;
-        clGetDeviceIDs(platform[platformIdx], CL_DEVICE_TYPE_ALL, 10, devices, &devicesNum);
-        printf("GPGPU devices found: %i\n", (int)devicesNum);
-
-        for (cl_uint deviceIdx = 0; deviceIdx < devicesNum; ++deviceIdx)
-        {
-            size_t valueSize;
-            clGetDeviceInfo(devices[deviceIdx], CL_DEVICE_NAME, 0, NULL, &valueSize);
-            char* value = new char[valueSize];
-            clGetDeviceInfo(devices[deviceIdx], CL_DEVICE_NAME, valueSize, value, NULL);
-            std::cout << "Use device #" << deviceIdx << " : " << value << std::endl;
-            delete[] value;
-            testDevice(devices[deviceIdx]);
-            std::cout << "\n=============================\n" << std::endl;
-        }
-    }
+    for (cl_uint idx = 0; idx < platformsNum; ++idx)
+        processPlatform(platforms[idx]);
 
     return 0;
 }

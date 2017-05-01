@@ -3,13 +3,13 @@
 DLM_CMODULE_START
 #include "cl/cl_ext_intel.h"
 DLM_CMODULE_END
-#include "dlm/cl/deviceInfo.hpp"
+#include "dlm/cl/device.hpp"
 using namespace dlmcl;
 
-void DeviceInfoFiller::fillIntel(void) noexcept
+void DeviceInfoBuilder::fillIntel(void) noexcept
 {
-    if (di.type & CL_DEVICE_TYPE_GPU)
-        di.mem.isSMA = true;
+    if (deviceInfo.type & CL_DEVICE_TYPE_GPU)
+        deviceInfo.memory.isSMA = true;
 }
 
 #endif // DLM_CL_SKIP_DEVICE_AMD

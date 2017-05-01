@@ -7,7 +7,6 @@
 #include "dlm/allocator.hpp"
 #include "dlm/cl/base.hpp"
 #include "dlm/cl/device.hpp"
-#include "dlm/cl/deviceInfo.hpp"
 
 namespace dlmcl {
 

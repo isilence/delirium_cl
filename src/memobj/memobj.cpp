@@ -22,7 +22,7 @@ bool Memobj::isAccessTypeValid(const cl_mem_flags accessType) noexcept
 
 Memobj* Memobj::getOptimal(Device& dev, size_t size, cl_mem_flags clMemType)
 {
-    if (dev.info.mem.isSMA)
+    if (dev.info.memory.isSMA)
         return new HostMemory(dev, size, clMemType);
 
     switch (clMemType) {

@@ -5,7 +5,7 @@
 #include <fstream>
 #include "../utils/utils.hpp"
 #include "../utils/tasks.hpp"
-#include "dlm/cl/deviceInfo.hpp"
+#include "dlm/cl/device.hpp"
 #include "dlm/cl/kernel.hpp"
 
 using namespace dlmcl;
@@ -30,7 +30,7 @@ void testDevice(cl_device_id device)
     std::cout << "host to host: " << Benchmark::run(new Grammian(dev, n, k, MT_HOST, MT_HOST)) << std::endl;
     std::cout << "host to gen: " << Benchmark::run(new Grammian(dev, n, k, MT_HOST, MT_GENERIC)) << std::endl;
     std::cout << "gen to host: " << Benchmark::run(new Grammian(dev, n, k, MT_GENERIC, MT_HOST)) << std::endl;
-    if (dev.info.mem.supportedTypes & MT_DEVICE) {
+    if (dev.info.memory.supportedTypes & MT_DEVICE) {
         std::cout << "dev to gen: " << Benchmark::run(new Grammian(dev, n, k, MT_DEVICE, MT_GENERIC)) << std::endl;
         std::cout << "dev to host: " << Benchmark::run(new Grammian(dev, n, k, MT_DEVICE, MT_HOST)) << std::endl;
     }
@@ -44,7 +44,7 @@ void testDevice(cl_device_id device)
     std::cout << "host to host: " << Benchmark::run(new Square(dev, n, MT_HOST, MT_HOST)) << std::endl;
     std::cout << "host to gen: " << Benchmark::run(new Square(dev, n, MT_HOST, MT_GENERIC)) << std::endl;
     std::cout << "gen to host: " << Benchmark::run(new Square(dev, n, MT_GENERIC, MT_HOST)) << std::endl;
-    if (dev.info.mem.supportedTypes & MT_DEVICE) {
+    if (dev.info.memory.supportedTypes & MT_DEVICE) {
         std::cout << "dev to gen: " << Benchmark::run(new Square(dev, n, MT_DEVICE, MT_GENERIC)) << std::endl;
         std::cout << "dev to host: " << Benchmark::run(new Square(dev, n, MT_DEVICE, MT_HOST)) << std::endl;
     }
