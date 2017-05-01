@@ -1,11 +1,5 @@
-﻿#include <string>
-#include <string.h>
-
-#include <iostream>
-#include <fstream>
 #include "../utils/utils.hpp"
 #include "../utils/tasks.hpp"
-#include "dlm/cl/deviceInfo.hpp"
 #include "dlm/cl/memobjPool.hpp"
 #include "dlm/cl/kernel.hpp"
 
