@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <stdlib.h>
 #include "utils.hpp"
 using namespace dlmcl;
