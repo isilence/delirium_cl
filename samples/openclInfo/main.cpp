@@ -3,6 +3,7 @@
 #include <fstream>
 
 #include "dlm/cl/device.hpp"
+#include "dlm/cl/controllers.hpp"
 #include "../utils/utils.hpp"
 #include "../utils/tasks.hpp"
 
@@ -52,6 +53,8 @@ void processPlatform(cl_platform_id platform)
 
 int main(void)
 {
+    registerDefaultVendorControllers();
+
     const int MAX_PLATFORMS = 10;
     cl_platform_id platforms[MAX_PLATFORMS];
     cl_uint platformsNum;

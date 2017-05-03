@@ -6,109 +6,15 @@
 namespace dlmcl {
 
 // ======================================
-//      device descriptors
+//          Controller class
 // ======================================
 
-enum DEVICE_VENDOR
+class Controller
 {
-    CDV_UNKNOWN = 0,
-    CDV_AMD,
-    CDV_INTEL,
-    CDV_NVIDIA
-};
-
-enum MEMORY_TYPE
-{
-    MT_GENERIC  = 0x1,
-    MT_HOST     = 0x2,
-    MT_DEVICE   = 0x4
-};
-
-struct PCITopology
-{
-    int bus;
-    int dev;
-    int fn;
-};
-
-struct MemoryCap
-{
-    long    size;
-    int     banks;
-};
-
-struct CacheInfo
-{
-    long size;
-    long width;
-};
-
-struct MemoryInfo
-{
-    MemoryCap global;
-    MemoryCap local;
-    CacheInfo cache;
-
-    int     supportedTypes;
-    bool    isSMA;
-};
-
-struct ComputeInfo
-{
-    int units;
-    int opwidth;
-    int warp;
-    int maxGroup;
-    int maxDim;
-};
-
-struct DeviceInfo
-{
-    MemoryInfo  memory;
-    ComputeInfo compute;
-    PCITopology topology;
-
-    cl_device_type      type;
-    enum DEVICE_VENDOR  vendor;
-};
-
-
-// ======================================
-//      device information builder
-// ======================================
-
-class DeviceInfoBuilder
-{
-private:
-    DeviceInfo deviceInfo;
-    const cl_device_id dev;
-
-    void fill(void) noexcept;
-    #if !defined(DLM_CL_SKIP_DEVICE_AMD)
-        void fillAMD(void) noexcept;
-    #endif
-    #if !defined(DLM_CL_SKIP_DEVICE_INTEL)
-        void fillIntel(void) noexcept;
-    #endif
-    #if !defined(DLM_CL_SKIP_DEVICE_NVIDIA)
-        void fillNvidia(void) noexcept;
-    #endif
-
 public:
-    explicit DeviceInfoBuilder(cl_device_id dev);
-    DeviceInfo get(void) noexcept;
+    virtual ~Controller(void) {};
+    virtual DeviceInfo getInfo(cl_device_id device) noexcept = 0;
 };
-
-inline DeviceInfoBuilder::DeviceInfoBuilder(cl_device_id dev)
-    : dev(dev)
-{
-    fill();
-}
-
-inline DeviceInfo DeviceInfoBuilder::get(void) noexcept
-{
-    return deviceInfo;
-}
 
 // ======================================
 //          Device class
@@ -117,30 +23,64 @@ inline DeviceInfo DeviceInfoBuilder::get(void) noexcept
 class Device
 {
 private:
+    Controller* controller;
+
     void initialize(cl_device_id device);
     void release(void) noexcept;
 
 public:
+    static const int MAX_VENDOR_NAME = 50;
+    static const char DEFAULT_VENDOR[MAX_VENDOR_NAME];
+
+    static void         getVendorName(cl_device_id device, char* buffer, size_t size);
+    static int          registerVendorController(const char *vendorName, Controller *vendor)    noexcept;
+    static Controller*  getVendorController(const char *vendorName)                             noexcept;
+
     explicit Device(cl_device_id device);
+    explicit Device(cl_device_id device, Controller* controller);
     explicit Device(Device&&)   = default;
     Device(void)                = delete;
     Device(const Device&)       = delete;
     ~Device(void)               noexcept;
 
+    void    setDefaultContext(void);
+    void    setContext(cl_context context) noexcept;
+    void    setDefaultController(void);
+    void    setController(Controller* controller) noexcept;
+
     cl_device_id    device;
-    cl_context      context;
     cl_platform_id  platform;
+    cl_context      context;
     DeviceInfo      info;
 };
 
 inline Device::Device(cl_device_id device)
+    : controller(nullptr)
 {
     initialize(device);
+    setDefaultContext();
+}
+
+inline Device::Device(cl_device_id device, Controller* controller)
+    : controller(controller)
+{
+    initialize(device);
+    setDefaultContext();
+}
+
+inline void Device::setController(Controller* newController) noexcept
+{
+    controller = newController;
 }
 
 inline Device::~Device(void) noexcept
 {
     release();
+}
+
+inline void Device::setContext(cl_context new_context) noexcept
+{
+    context = new_context;
 }
 
 } // ::dlmcl

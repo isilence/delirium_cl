@@ -18,5 +18,64 @@ namespace dlmcl {
 
 class CLException {};
 
+// ======================================
+//      device descriptors
+// ======================================
+
+enum MEMORY_TYPE
+{
+    MT_GENERIC  = 0x1,
+    MT_HOST     = 0x2,
+    MT_DEVICE   = 0x4
+};
+
+struct PCITopology
+{
+    int bus;
+    int dev;
+    int fn;
+};
+
+struct MemoryCap
+{
+    long    size;
+    int     banks;
+};
+
+struct CacheInfo
+{
+    long size;
+    long width;
+};
+
+struct MemoryInfo
+{
+    MemoryCap global;
+    MemoryCap local;
+    CacheInfo cache;
+
+    int     supportedTypes;
+    bool    isSMA;
+};
+
+struct ComputeInfo
+{
+    int units;
+    int opwidth;
+    int warp;
+    int maxGroup;
+    int maxDim;
+};
+
+struct DeviceInfo
+{
+    MemoryInfo  memory;
+    ComputeInfo compute;
+    PCITopology topology;
+
+    cl_device_type      type;
+};
+
+
 } // ::dlmcl
 #endif // DLM_CL_DEVICE_HPP_

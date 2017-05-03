@@ -57,15 +57,15 @@ Program buildProgram(dlmcl::Device& dev, std::string path, std::string kernelNam
     checkError(clCreateProgramWithSource);
 
     std::string buildOptions = "-cl-fast-relaxed-math -cl-no-signed-zeros -cl-mad-enable ";
-    if ((dev.info.type & CL_DEVICE_TYPE_GPU) && dev.info.vendor == CDV_AMD)
-        buildOptions += " -O5 ";
+    buildOptions += " -O3 ";
     buildOptions += getOptOptions(dev);
 
     errcode = clBuildProgram(program, 1, &dev.device, buildOptions.data(), NULL, NULL);
     if (errcode != CL_SUCCESS) {
         size_t len;
         char *build_log;
-        std::cout << "There were error during build kernel code. Please, check program code. Errcode = " << errcode << std::endl;
+        std::cout << "There were error during build kernel code. Please, check program code. Errcode = "
+                  << errcode << std::endl;
         clGetProgramBuildInfo(program, dev.device, CL_PROGRAM_BUILD_LOG, 0, NULL, &len);
         build_log = new char[len+1];
         clGetProgramBuildInfo(program, dev.device, CL_PROGRAM_BUILD_LOG, len, build_log, NULL);

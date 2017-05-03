@@ -5,8 +5,7 @@
 #include <fstream>
 #include "../utils/utils.hpp"
 #include "../utils/tasks.hpp"
-#include "dlm/cl/device.hpp"
-#include "dlm/cl/kernel.hpp"
+#include "dlm/cl/controllers.hpp"
 
 using namespace dlmcl;
 using namespace std;
@@ -53,6 +52,8 @@ void testDevice(cl_device_id device)
 
 int main(void)
 {
+    registerDefaultVendorControllers();
+
     cl_int errcode;
     cl_platform_id platform[10];
     cl_uint platformsNum;
