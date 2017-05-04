@@ -7,20 +7,51 @@ DLM_CMODULE_END
 #include "dlm/cl/controllers.hpp"
 using namespace dlmcl;
 
+
+static void getPCITopology(DeviceInfo &info, cl_device_id device) noexcept
+{
+    // undocumented Nvidia API
+    #define CL_DEVICE_PCI_BUS_ID_NV  0x4008
+    #define CL_DEVICE_PCI_SLOT_ID_NV 0x4009
+
+    cl_int bus = -1;
+    cl_int slot = -1;
+
+    cl_int err = clGetDeviceInfo (device, CL_DEVICE_PCI_BUS_ID_NV, sizeof(bus), &bus, NULL);
+    if (err != CL_SUCCESS)
+        return;
+
+    err = clGetDeviceInfo(device, CL_DEVICE_PCI_SLOT_ID_NV, sizeof(slot), &slot, NULL);
+    if (err != CL_SUCCESS)
+        return;
+
+    info.topology.bus = bus;
+    info.topology.dev = (slot >> 3) & 0xff;
+    info.topology.fn = slot & 0x7;
+}
+
+static void getMemoryArchitecture(DeviceInfo &info, cl_device_id device) noexcept
+{
+    cl_bool isSMA;
+    const cl_int err = clGetDeviceInfo(device, CL_DEVICE_INTEGRATED_MEMORY_NV, sizeof(isSMA), &isSMA, NULL);
+    if (err == CL_SUCCESS)
+        info.memory.isSMA = (isSMA != 0);
+}
+
+static void getMemoryCaps(DeviceInfo &info, cl_device_id device) noexcept
+{
+    cl_uint warp;
+    const cl_int err = clGetDeviceInfo(device, CL_DEVICE_WARP_SIZE_NV, sizeof(warp), &warp, NULL);
+    if (err == CL_SUCCESS)
+        info.compute.warp = warp;
+}
+
 DeviceInfo NVidiaController::getInfo(cl_device_id device) noexcept
 {
     DeviceInfo info = GenericController::getInfo(device);
-    cl_int err;
-
-    cl_uint warp;
-    err = clGetDeviceInfo(device, CL_DEVICE_WARP_SIZE_NV, sizeof(warp), &warp, NULL);
-    if (err == CL_SUCCESS)
-        info.compute.warp = warp;
-
-    cl_bool isSMA;
-    err = clGetDeviceInfo(device, CL_DEVICE_INTEGRATED_MEMORY_NV, sizeof(isSMA), &isSMA, NULL);
-    if (err == CL_SUCCESS)
-        info.memory.isSMA = (isSMA != 0);
+    getPCITopology(info, device);
+    getMemoryArchitecture(info, device);
+    getMemoryCaps(info, device);
 
     return info;
 }
