@@ -109,7 +109,7 @@ void dlmcl::registerDefaultVendorControllers(void)
 
     Controller* def = new GenericController();
     Controller* amd = new AMDController();
-    Controller* nvidia = new NVidiaController();
+    Controller* nvidia = new NvidiaController();
     Controller* intel = new IntelController();
 
     static std::vector<Controller*> guard = {def, amd, nvidia, intel};

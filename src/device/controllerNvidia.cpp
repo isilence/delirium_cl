@@ -46,7 +46,7 @@ static void getMemoryCaps(DeviceInfo &info, cl_device_id device) noexcept
         info.compute.warp = warp;
 }
 
-DeviceInfo NVidiaController::getInfo(cl_device_id device) noexcept
+DeviceInfo NvidiaController::getInfo(cl_device_id device) noexcept
 {
     DeviceInfo info = GenericController::getInfo(device);
     getPCITopology(info, device);

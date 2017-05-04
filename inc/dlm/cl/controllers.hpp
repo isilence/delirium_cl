@@ -20,10 +20,10 @@ public:
     virtual DeviceInfo getInfo(cl_device_id device) noexcept;
 };
 
-class NVidiaController : public GenericController
+class NvidiaController : public GenericController
 {
 public:
-    virtual ~NVidiaController(void) {};
+    virtual ~NvidiaController(void) {};
     virtual DeviceInfo getInfo(cl_device_id device) noexcept;
 };
 

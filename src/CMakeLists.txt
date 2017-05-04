@@ -24,10 +24,11 @@ set(SRC_DLM_CL_MEMORY
     ${DIR_INC}/dlm/cl/memobjPool.hpp
 )
 set(SRC_DLM_CL_DEVICE
+    ${DIR_INC}/dlm/cl/controllers.hpp
     ${DIR_SRC}/device/controllerAMD.cpp
     ${DIR_SRC}/device/controllerGeneric.cpp
     ${DIR_SRC}/device/controllerIntel.cpp
-    ${DIR_SRC}/device/controllerNVidia.cpp
+    ${DIR_SRC}/device/controllerNvidia.cpp
     ${DIR_SRC}/device/device.cpp
 )
 set (SRC_DLM_CL_BASE
@@ -47,7 +48,7 @@ set(SOURCE_FILES
     ${SRC_DLM_CL_BASE}
     ${SRC_DLM_CL_DEVICE}
     ${SRC_DLM_CL_MEMORY}
-        ../inc/dlm/cl/controllers.hpp)
+)
 
 add_library(dlmCl ${SOURCE_FILES})
 link_directories(${OpenCL_LIBRARY})
