@@ -17,6 +17,17 @@ mkdir build && cd ./build
 cmake ../ && make
 ```
 
+### Experimental results
+
+![perfromance counters](https://github.com/ISilence/delirium_cl/blob/data/1.jpeg)
+
+* Grammian matrix (computation intensive task)
+  * small task size - x1.3 boost
+  * large task sizes - ~x1.0
+* Element-wise array processing (data-intensive task)
+  * uniform x1.7 boost
+
+
 ### Example
 
 ```c++
@@ -47,8 +58,4 @@ clFinish(queue);
 mem->switchToHost(queue);
 void* ptr = mem->getHostMemory();
 ```
-
-### Contributors
-
-Pavel Begunkov (asml.silence@gmail.com)
 
