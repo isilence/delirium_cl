@@ -27,7 +27,10 @@ Memobj* Memobj::getOptimal(Device& dev, size_t size, cl_mem_flags clMemType)
 
     switch (clMemType) {
         case CL_MEM_READ_ONLY:
-            return new DeviceMemory(dev, size, clMemType);
+            if (dev.info.memory.supportedTypes & MT_DEVICE)
+                return new DeviceMemory(dev, size, clMemType);
+            else
+                return new GenericMemory(dev, size, clMemType);
         case CL_MEM_WRITE_ONLY:
         case CL_MEM_READ_WRITE:
             return new GenericMemory(dev, size, clMemType);
