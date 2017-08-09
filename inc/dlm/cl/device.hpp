@@ -9,11 +9,19 @@ namespace dlmcl {
 //          Controller class
 // ======================================
 
+enum OPTIMIZATION_LEVEL {
+    OPT_O1 = 0,
+    OPT_O2 = 1,
+    OPT_O3 = 2,
+    OPT_MAX = OPT_O3
+};
+
 class Controller
 {
 public:
     virtual ~Controller(void) {};
     virtual DeviceInfo getInfo(cl_device_id device) noexcept = 0;
+    virtual const char* getCompilationOptions(cl_device_id device, enum OPTIMIZATION_LEVEL) noexcept = 0;
 };
 
 // ======================================
@@ -48,6 +56,8 @@ public:
     void    setDefaultController(void);
     void    setController(Controller* controller) noexcept;
 
+    const char* getCompilationOptions(enum OPTIMIZATION_LEVEL) noexcept;
+
     cl_device_id    device;
     cl_platform_id  platform;
     cl_context      context;
@@ -81,6 +91,11 @@ inline Device::~Device(void) noexcept
 inline void Device::setContext(cl_context new_context) noexcept
 {
     context = new_context;
+}
+
+inline const char* Device::getCompilationOptions(enum OPTIMIZATION_LEVEL level) noexcept
+{
+    return controller->getCompilationOptions(device, level);
 }
 
 } // ::dlmcl

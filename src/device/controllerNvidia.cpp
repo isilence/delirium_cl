@@ -56,4 +56,10 @@ DeviceInfo NvidiaController::getInfo(cl_device_id device) noexcept
     return info;
 }
 
+const char* NvidiaController::getCompilationOptions(cl_device_id device, enum OPTIMIZATION_LEVEL level) noexcept
+{
+    static const char opts[] = "-cl-fast-relaxed-math -cl-no-signed-zeros -cl-mad-enable -D DLM_NVIDIA";
+    return opts;
+}
+
 #endif // DLM_CL_SKIP_VENDOR_NVIDIA

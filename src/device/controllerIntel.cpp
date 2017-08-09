@@ -16,4 +16,10 @@ DeviceInfo IntelController::getInfo(cl_device_id device) noexcept
     return info;
 }
 
+const char* IntelController::getCompilationOptions(cl_device_id device, enum OPTIMIZATION_LEVEL level) noexcept
+{
+    static const char opts[] = "-cl-fast-relaxed-math -cl-no-signed-zeros -cl-mad-enable -D DLM_INTEL";
+    return opts;
+}
+
 #endif // DLM_CL_SKIP_VENDOR_INTEL

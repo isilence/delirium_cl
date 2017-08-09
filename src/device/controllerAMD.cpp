@@ -51,4 +51,10 @@ DeviceInfo AMDController::getInfo(cl_device_id device) noexcept
     return info;
 }
 
+const char* AMDController::getCompilationOptions(cl_device_id device, enum OPTIMIZATION_LEVEL level) noexcept
+{
+    static const char opts[] = "-cl-fast-relaxed-math -cl-no-signed-zeros -cl-mad-enable -O4 -D DLM_AMD";
+    return opts;
+}
+
 #endif // DLM_CL_SKIP_VENDOR_AMD

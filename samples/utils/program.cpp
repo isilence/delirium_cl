@@ -44,6 +44,7 @@ std::string getOptOptions(dlmcl::Device& dev)
     opt += " -D " DLM_QUOTE_(BLOCK_SIDEY) "=" DLM_QUOTE(BLOCK_SIDEY);
     opt += " -D DLM_ARCH_VECSZ_FLOAT=";
     opt += std::to_string(vec_width);
+    opt += ' ';
 
     return opt;
 }
@@ -56,10 +57,7 @@ Program buildProgram(dlmcl::Device& dev, std::string path, std::string kernelNam
     cl_program program = clCreateProgramWithSource(dev.context, 1, (const char **)&s, NULL, &errcode);
     checkError(clCreateProgramWithSource);
 
-    std::string buildOptions = "-cl-fast-relaxed-math -cl-no-signed-zeros -cl-mad-enable ";
-    buildOptions += " -O3 ";
-    buildOptions += getOptOptions(dev);
-
+    std::string buildOptions = getOptOptions(dev) + dev.getCompilationOptions(OPT_MAX);
     errcode = clBuildProgram(program, 1, &dev.device, buildOptions.data(), NULL, NULL);
     if (errcode != CL_SUCCESS) {
         size_t len;

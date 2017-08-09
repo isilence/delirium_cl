@@ -11,6 +11,7 @@ class GenericController : public Controller
 public:
     virtual ~GenericController(void) {};
     virtual DeviceInfo getInfo(cl_device_id device) noexcept;
+    virtual const char* getCompilationOptions(cl_device_id device, enum OPTIMIZATION_LEVEL level) noexcept;
 };
 
 class AMDController : public GenericController
@@ -18,6 +19,7 @@ class AMDController : public GenericController
 public:
     virtual ~AMDController(void) {};
     virtual DeviceInfo getInfo(cl_device_id device) noexcept;
+    virtual const char* getCompilationOptions(cl_device_id device, enum OPTIMIZATION_LEVEL level) noexcept;
 };
 
 class NvidiaController : public GenericController
@@ -25,6 +27,7 @@ class NvidiaController : public GenericController
 public:
     virtual ~NvidiaController(void) {};
     virtual DeviceInfo getInfo(cl_device_id device) noexcept;
+    virtual const char* getCompilationOptions(cl_device_id device, enum OPTIMIZATION_LEVEL level) noexcept;
 };
 
 class IntelController : public GenericController
@@ -32,6 +35,7 @@ class IntelController : public GenericController
 public:
     virtual ~IntelController(void) {};
     virtual DeviceInfo getInfo(cl_device_id device) noexcept;
+    virtual const char* getCompilationOptions(cl_device_id device, enum OPTIMIZATION_LEVEL level) noexcept;
 };
 
 // needs refactoring: no exception safety, destruction order dependent

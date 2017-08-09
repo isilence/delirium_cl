@@ -95,6 +95,12 @@ DeviceInfo GenericController::getInfo(cl_device_id device) noexcept
     return info;
 }
 
+const char* GenericController::getCompilationOptions(cl_device_id device, enum OPTIMIZATION_LEVEL) noexcept
+{
+    static const char opts[] = "-cl-fast-relaxed-math -cl-no-signed-zeros -cl-mad-enable ";
+    return opts;
+}
+
 // ======================================
 //          register default
 // ======================================
